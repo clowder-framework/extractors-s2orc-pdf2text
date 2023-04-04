@@ -34,9 +34,11 @@ The current `grobid2json` tool uses Grobid to first process each PDF into XML, t
 You will need to have Java installed on your machine. Then, you can install your own version of Grobid and get it running.
 
 1. Using docker : 
+```
 docker pull grobid/grobid:0.6.2
 
 docker run -p 8070:8070 grobid/grobid:0.6.2
+```
 
 2. OR Using script:
 
