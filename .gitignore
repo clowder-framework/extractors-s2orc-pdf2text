@@ -1,0 +1,35 @@
+# python binaries
+*.pyc
+bin/
+/*/bin
+.cache/
+venv
+
+# virtualenvs
+**/venv
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# vim swap files
+*.swp
+
+# IDEA:
+.idea/
+**.iml
+**.iml
+
+# IDEA - generated artifacts
+**/build/
+**/out/
+
+# Apple metadata
+**/.DS_Store
+
+# Docker ENV files
+.env
+# Docker xml file
+**.xml
+
+# Python builds
+*.egg-info/
