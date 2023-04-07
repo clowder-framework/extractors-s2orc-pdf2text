@@ -4,10 +4,13 @@ RUN apk --update add python3 py3-pip && rm -rf /var/lib/apt/lists/*
 
 COPY doc2json ./doc2json
 COPY tests ./tests
-COPY build_run.sh setup.py requirements.txt ./
+COPY build_run.sh setup.py textextractor.py requirements.txt ./
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt --no-cache-dir
+
+# install pyclowder
+#RUN python -m pip install --ignore-installed pyclowder
 
 WORKDIR ./
 ENV PYTHONPATH=./
