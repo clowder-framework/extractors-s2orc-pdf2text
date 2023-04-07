@@ -57,7 +57,7 @@ The expected port for the Grobid service is 8070, but you can change this as wel
 There are a couple of test PDFs in `tests/input/` if you'd like to try with that.
 
 1. Using docker :
-- Run docker build :  ` docker build . -t doc2json:0.1`. Then `docker run doc2json:0.1`.
+- Run docker build :  ` docker build . -t textextractor:0.1`. Then `docker run textextractor:0.1`.
 - Using docker-compose : `docker-compose up`
 
 2. Using python console :
