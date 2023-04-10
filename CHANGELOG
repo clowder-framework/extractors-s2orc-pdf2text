@@ -1,0 +1,16 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## Unreleased
+
+### Added
+- AllenAI s2orc-doc2json as a clowder extractor. [#3](https://github.com/clowder-framework/text-extractor/issues/3)
+
+### Changed
+
+
+### Fixed
+
