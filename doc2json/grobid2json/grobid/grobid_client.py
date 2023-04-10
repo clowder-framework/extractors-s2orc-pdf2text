@@ -4,9 +4,13 @@ import json
 import argparse
 import time
 import glob
+import logging
 from doc2json.grobid2json.grobid.client import ApiClient
 import ntpath
 from typing import List
+
+# create log object with current module name
+log = logging.getLogger(__name__)
 
 '''
 This version uses the standard ProcessPoolExecutor for parallelizing the concurrent calls to the GROBID services.
@@ -133,14 +137,14 @@ class GrobidClient(ApiClient):
         if os.path.isfile(filename):
             return
 
-        print("PDF File to process is ", pdf_file)
+        log.info("PDF File to process is ", pdf_file)
         pdf_strm = open(pdf_file, 'rb').read()
         tei_text = self.process_pdf_stream(pdf_file, pdf_strm, output, service)
 
         # writing TEI file
         if tei_text:
             with io.open(filename, 'w+', encoding='utf8') as tei_file:
-                print("writing to tei file ", tei_file)
+                log.info("writing to tei file ", tei_file)
                 tei_file.write(tei_text)
 
     def process_citation(self, bib_string: str, log_file: str) -> str:

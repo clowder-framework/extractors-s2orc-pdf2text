@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 import time
+import logging
 from bs4 import BeautifulSoup
 from typing import Optional, Dict
 
@@ -11,6 +12,9 @@ from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json,
 BASE_TEMP_DIR = 'temp'
 BASE_OUTPUT_DIR = 'output'
 BASE_LOG_DIR = 'log'
+
+# create log object with current module name
+log = logging.getLogger(__name__)
 
 
 def process_pdf_stream(input_file: str, sha: str, input_stream: bytes, grobid_config: Optional[Dict] = None) -> Dict:
@@ -54,6 +58,7 @@ def process_pdf_file(
     paper_id = '.'.join(input_file.split('/')[-1].split('.')[:-1])
     tei_file = os.path.join(temp_dir, f'{paper_id}.tei.xml')
     output_file = os.path.join(output_dir, f'{paper_id}.json')
+    log.info("Files %s, %s, %s", paper_id, tei_file, output_file)
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):
