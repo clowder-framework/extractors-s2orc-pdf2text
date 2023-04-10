@@ -133,7 +133,7 @@ class GrobidClient(ApiClient):
         if os.path.isfile(filename):
             return
 
-        print(pdf_file)
+        print("PDF File to process is ", pdf_file)
         pdf_strm = open(pdf_file, 'rb').read()
         tei_text = self.process_pdf_stream(pdf_file, pdf_strm, output, service)
 
