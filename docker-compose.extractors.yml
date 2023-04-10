@@ -1,0 +1,27 @@
+version: '3.5'
+
+# to use the extractors start with
+# docker-compose -f docker-compose.yml -f docker-compose.extractors.yml up
+
+services:
+  # ----------------------------------------------------------------------
+  # EXTRACTORS
+  # ----------------------------------------------------------------------
+
+  # process pdf files
+  grobid:
+    image: grobid/grobid:0.6.2
+    ports:
+      - 8070:8070
+  # extractor text-extractor
+  textextractor:
+    image: textextractor:0.1
+    restart: unless-stopped
+    networks:
+      - clowder
+    depends_on:
+      - grobid
+      - rabbitmq
+      - clowder
+    environment:
+      - RABBITMQ_URI=${RABBITMQ_URI:-amqp://guest:guest@rabbitmq/%2F}
