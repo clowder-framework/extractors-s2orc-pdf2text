@@ -144,7 +144,7 @@ class GrobidClient(ApiClient):
         # writing TEI file
         if tei_text:
             with io.open(filename, 'w+', encoding='utf8') as tei_file:
-                log.info("writing to tei file ", tei_file)
+                log.info("writing to tei file %s", tei_file)
                 tei_file.write(tei_text)
 
     def process_citation(self, bib_string: str, log_file: str) -> str:
