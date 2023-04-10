@@ -3,15 +3,69 @@
 
 import time
 import logging
+import json
 import os
+from typing import Optional, Dict
+import logging
+
 from pyclowder.extractors import Extractor
 import pyclowder.files
 
-from doc2json.grobid2json.process_pdf import process_pdf_file
+from doc2json.grobid2json.grobid.grobid_client import GrobidClient
+from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json
 
-BASE_TEMP_DIR = '/'
-BASE_OUTPUT_DIR = '/'
-BASE_LOG_DIR = '/log'
+
+# create log object with current module name
+log = logging.getLogger(__name__)
+
+BASE_TEMP_DIR = 'temp'
+BASE_OUTPUT_DIR = 'output'
+BASE_LOG_DIR = 'log'
+
+
+def process_pdf_file(
+        input_file: str,
+        temp_dir: str = BASE_TEMP_DIR,
+        output_dir: str = BASE_OUTPUT_DIR,
+        grobid_config: Optional[Dict] = None
+) -> str:
+    """
+    Process a PDF file and get JSON representation
+    :param input_file:
+    :param temp_dir:
+    :param output_dir:
+    :return:
+    """
+    os.makedirs(temp_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # get paper id as the name of the file
+    paper_id = '.'.join(input_file.split('/')[-1].split('.')[:-1])
+    tei_file = os.path.join(temp_dir, f'{paper_id}.tei.xml')
+    output_file = os.path.join(output_dir, f'{paper_id}.json')
+    log.info("Files %s, %s, %s", paper_id, tei_file, output_file)
+
+    # check if input file exists and output file doesn't
+    if not os.path.exists(input_file):
+        raise FileNotFoundError(f"{input_file} doesn't exist")
+    if os.path.exists(output_file):
+        print(f'{output_file} already exists!')
+
+    # process PDF through Grobid -> TEI.XML
+    client = GrobidClient(grobid_config)
+    # TODO: compute PDF hash
+    # TODO: add grobid version number to output
+    client.process_pdf(input_file, temp_dir, "processFulltextDocument")
+
+    # process TEI.XML -> JSON
+    assert os.path.exists(tei_file)
+    paper = convert_tei_xml_file_to_s2orc_json(tei_file)
+
+    # write to file
+    with open(output_file, 'w') as outf:
+        json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
+
+    return output_file
 
 class TextExtractor(Extractor):
     def __init__(self):
@@ -33,7 +87,6 @@ class TextExtractor(Extractor):
         # uncomment to see the resource
         # print(resource)
 
-        logger = logging.getLogger(__name__)
         input_file = resource["local_paths"][0]
         input_file_id = resource['id']
         dataset_id = resource['parent'].get('id')
@@ -51,10 +104,10 @@ class TextExtractor(Extractor):
         # process pdf file
         start_time = time.time()
         input_filename = resource["name"]
-        process_pdf_file(input_file, temp_dir, output_dir)
+        processed_output_file = process_pdf_file(input_file, temp_dir, output_dir)
         runtime = round(time.time() - start_time, 3)
-        print("runtime: %s seconds " % runtime)
-        print('done.')
+        log.info("runtime: %s seconds " % runtime)
+        log.info('done.')
         connector.message_process(resource, "Pdf to text conversion finished...")
 
         # clean existing duplicate
