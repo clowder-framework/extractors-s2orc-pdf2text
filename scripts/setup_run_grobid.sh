@@ -21,7 +21,7 @@ else
   wget https://github.com/kermitt2/grobid/archive/0.6.1.zip
   unzip 0.6.1.zip
   rm 0.6.1.zip
-  cd $HOME/grobid-0.6.1
+  cd $GrobidHome
   ./gradlew clean install
 
   ## Start Grobid

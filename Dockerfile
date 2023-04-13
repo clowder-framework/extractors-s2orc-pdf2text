@@ -2,7 +2,8 @@ FROM python:3.10
 
 COPY doc2json ./doc2json
 COPY tests ./tests
-COPY build_run.sh setup.py textextractor.py requirements.txt extractor_info.json ./
+COPY scripts/setup_run_grobid.sh ./setup_run_grobid.sh
+COPY docker-entrypoint.sh textextractor.py requirements.txt extractor_info.json ./
 
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
@@ -14,4 +15,6 @@ ENV PYTHONPATH=./
 
 EXPOSE 8070
 
+RUN ["chmod", "+x", "docker-entrypoint.sh"]
+#CMD ["textextractor"]
 CMD ["python3","textextractor.py", "--heartbeat", "40"]
