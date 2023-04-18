@@ -2,7 +2,6 @@ FROM python:3.10
 
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
-RUN pip install -r requirements.txt --no-cache-dir
 
 COPY --from=openjdk:slim / /
 
@@ -29,6 +28,7 @@ COPY scripts/setup_run_grobid.sh ./setup_run_grobid.sh
 COPY docker-entrypoint.sh textextractor.py requirements.txt extractor_info.json ./
 COPY docker-entrypoint.sh /usr/local/bin/
 
+RUN pip install -r requirements.txt --no-cache-dir
 
 WORKDIR ./
 ENV PYTHONPATH=./
