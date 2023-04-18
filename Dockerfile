@@ -13,8 +13,8 @@ COPY --from=openjdk:18-slim / /
 # RUN apt-get install ca-certificates-java && apt-get clean && update-ca-certificates -f;
 
 # setup JAVA_HOME
-ENV JAVA_HOME /usr/local/openjdk-18/
-ENV PATH $JAVA_HOME/bin:$PATH
+#ENV JAVA_HOME /usr/local/openjdk-18/
+#ENV PATH $JAVA_HOME/bin:$PATH
 # RUN export JAVA_HOME
 
 
