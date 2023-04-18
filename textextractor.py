@@ -82,7 +82,7 @@ class TextExtractor(Extractor):
 
 if __name__ == "__main__":
     # # for testing
-    gradle_process = subprocess.call('./scripts/run_grobid.sh', shell=True)
+    gradle_process = subprocess.call('./run_grobid.sh', shell=True)
     #process_pdf_file("tests/pdf/N18-3011.pdf", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
 
     extractor = TextExtractor()
