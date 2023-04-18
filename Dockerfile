@@ -17,15 +17,16 @@ ENV JAVA_HOME /usr/local/openjdk-11/
 ENV PATH $JAVA_HOME/bin:$PATH
 # RUN export JAVA_HOME
 
+COPY requirements.txt ./
+RUN pip install -r requirements.txt --no-cache-dir
 
 COPY doc2json ./doc2json
 COPY tests ./tests
 COPY scripts/setup_run_grobid.sh ./setup_run_grobid.sh
 COPY scripts/run_grobid.sh ./run_grobid.sh
-COPY docker-entrypoint.sh textextractor.py requirements.txt extractor_info.json ./
+COPY docker-entrypoint.sh textextractor.py extractor_info.json ./
 COPY docker-entrypoint.sh /usr/local/bin/
 
-RUN pip install -r requirements.txt --no-cache-dir
 
 WORKDIR ./
 ENV PYTHONPATH=./
