@@ -3,7 +3,7 @@ FROM python:3.10
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
 
-COPY --from=openjdk:18-slim / /
+COPY --from=openjdk:11-slim / /
 
 # install openJDK11
 # RUN apt-get install -y default-jdk
@@ -13,8 +13,8 @@ COPY --from=openjdk:18-slim / /
 # RUN apt-get install ca-certificates-java && apt-get clean && update-ca-certificates -f;
 
 # setup JAVA_HOME
-#ENV JAVA_HOME /usr/local/openjdk-18/
-#ENV PATH $JAVA_HOME/bin:$PATH
+ENV JAVA_HOME /usr/local/openjdk-11/
+ENV PATH $JAVA_HOME/bin:$PATH
 # RUN export JAVA_HOME
 
 
