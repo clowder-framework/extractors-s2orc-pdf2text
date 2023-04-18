@@ -17,5 +17,6 @@ EXPOSE 8070
 
 RUN ["chmod", "+x", "docker-entrypoint.sh"]
 RUN ["chmod", "+x", "setup_run_grobid.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["textextractor"]
 #CMD ["python3","textextractor.py", "--heartbeat", "40"]
