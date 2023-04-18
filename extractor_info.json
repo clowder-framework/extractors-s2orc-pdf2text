@@ -14,9 +14,7 @@
   ],
   "process": {
     "file": [
-      "application/pdf",
-      "application/*",
-      "text/plain"
+      "application/pdf"
     ]
   },
   "external_services": [],
