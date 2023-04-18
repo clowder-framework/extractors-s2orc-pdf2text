@@ -3,10 +3,8 @@
 GrobidHome="$HOME/grobid-0.6.1/"
 
 if [ $1 = "extractor" ]; then
-  #./setup_run_grobid.sh
-  #python3 textextractor.py
-  echo "python3"
-  sleep 5m
+  ./setup_run_grobid.sh
+  python3 textextractor.py
 else
   exec "$@"
 fi
