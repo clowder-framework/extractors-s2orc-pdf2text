@@ -1,7 +1,7 @@
 {
   "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
-  "name": "textextractor",
-  "version": "0.1",
+  "name": "extractors-pdf2text",
+  "version": "0.2",
   "description": "extracts text from pdf files",
   "author": "Mathew, Minu <minum@illinois.edu>; Lo, Kyle  and Wang, Lucy Lu  and Neumann, Mark  and Kinney, Rodney  and Weld, Daniel",
   "contributors": [],
@@ -9,7 +9,7 @@
   "repository": [
     {
       "repType": "git",
-      "repUrl": "https://github.com/clowder-framework/text-extractor"
+      "repUrl": "https://github.com/clowder-framework/extractors-s2orc-pdf2text"
     }
   ],
   "process": {
