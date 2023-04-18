@@ -6,6 +6,7 @@ if [ $1 = "extractor" ]; then
   #./setup_run_grobid.sh
   #python3 textextractor.py
   echo "python3"
+  sleep 5m
 else
   exec "$@"
 fi
