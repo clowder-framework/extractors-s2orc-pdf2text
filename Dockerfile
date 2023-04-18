@@ -10,9 +10,7 @@ COPY --from=openjdk:slim / /
 # RUN apt-get update && apt-get install -y ant && apt-get clean;
 
 # fix certificate issues
-RUN apt-get install ca-certificates-java && \
-    apt-get clean &&\
-    update-ca-certificates -f;
+# RUN apt-get install ca-certificates-java && apt-get clean && update-ca-certificates -f;
 
 # setup JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/java
