@@ -7,9 +7,7 @@ COPY --from=openjdk:slim / /
 
 # install openJDK11
 # RUN apt-get install -y default-jdk
-RUN apt-get update && \
-    apt-get install -y ant && \
-    apt-get clean;
+# RUN apt-get update && apt-get install -y ant && apt-get clean;
 
 # fix certificate issues
 RUN apt-get install ca-certificates-java && \
