@@ -5,7 +5,7 @@ RUN apt-get install -y libxml2 libxslt-dev
 
 # install openJDK11
 RUN apt-get update && \
-    apt-get install -y openjdk-11-jdk && \
+    apt-get install -y openjdk-8-jdk && \
     apt-get install -y ant && \
     apt-get clean;
 
