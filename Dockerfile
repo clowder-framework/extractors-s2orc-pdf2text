@@ -3,7 +3,7 @@ FROM python:3.10
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
 
-COPY --from=openjdk:slim / /
+COPY --from=openjdk:18-slim / /
 
 # install openJDK11
 # RUN apt-get install -y default-jdk
