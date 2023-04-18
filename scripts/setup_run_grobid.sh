@@ -12,7 +12,7 @@ if [[ -d "$GrobidHome" ]]; then
   else
     # install and run gradle
     ./gradlew clean install
-    #./gradlew run
+    ./gradlew run
   fi
 else
   # need to get and install gradlew
@@ -25,5 +25,5 @@ else
   ./gradlew clean install
 
   ## Start Grobid
-  #./gradlew run
+  ./gradlew run
 fi
