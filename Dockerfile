@@ -1,11 +1,12 @@
 FROM python:3.10
+COPY --from=openjdk:slim / /
 
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
 
 # install openJDK11
+# RUN apt-get install -y default-jdk
 RUN apt-get update && \
-    apt-get install -y default-jdk && \
     apt-get install -y ant && \
     apt-get clean;
 
