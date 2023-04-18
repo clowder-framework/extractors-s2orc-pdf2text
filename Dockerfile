@@ -16,5 +16,6 @@ ENV PYTHONPATH=./
 EXPOSE 8070
 
 RUN ["chmod", "+x", "docker-entrypoint.sh"]
-#CMD ["textextractor"]
-CMD ["python3","textextractor.py", "--heartbeat", "40"]
+RUN ["chmod", "+x", "setup_run_grobid.sh"]
+CMD ["textextractor"]
+#CMD ["python3","textextractor.py", "--heartbeat", "40"]
