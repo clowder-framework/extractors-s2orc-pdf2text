@@ -1,8 +1,10 @@
 FROM python:3.10
-COPY --from=openjdk:slim / /
 
 # install some libgcc requirements
 RUN apt-get install -y libxml2 libxslt-dev
+RUN pip install -r requirements.txt --no-cache-dir
+
+COPY --from=openjdk:slim / /
 
 # install openJDK11
 # RUN apt-get install -y default-jdk
@@ -20,7 +22,6 @@ ENV JAVA_HOME /usr/lib/jvm/java
 ENV PATH $JAVA_HOME/bin:$PATH
 # RUN export JAVA_HOME
 
-RUN pip install -r requirements.txt --no-cache-dir
 
 COPY doc2json ./doc2json
 COPY tests ./tests
