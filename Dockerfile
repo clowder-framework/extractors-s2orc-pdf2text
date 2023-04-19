@@ -20,6 +20,7 @@ ENV PATH $JAVA_HOME/bin:$PATH
 COPY requirements.txt ./
 RUN pip install -r requirements.txt --no-cache-dir
 
+COPY grobid-0.6.1 ./grobid-0.6.1
 COPY doc2json ./doc2json
 COPY tests ./tests
 COPY scripts/setup_run_grobid.sh ./setup_run_grobid.sh
