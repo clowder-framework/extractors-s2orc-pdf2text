@@ -3,6 +3,7 @@
 GrobidHome="/grobid-0.6.1/"
 
 if [ $1 = "extractor" ]; then
+  cd $GrobidHome
   ./gradlew clean install
   ./gradlew run &
   Grobid_PID=$!
