@@ -3,7 +3,8 @@
 GrobidHome="/grobid-0.6.1/"
 
 if [ $1 = "extractor" ]; then
-  ./setup_run_grobid.sh &
+  ./gradlew clean install
+  ./gradlew run &
   Grobid_PID=$!
   # check if grobid service is running. get the second line output of gradlew status and check if busy
   while [[ $(./gradlew --status | sed -n '2 p' | grep "BUSY") ]]
