@@ -12,7 +12,7 @@ if [ $1 = "extractor" ]; then
     # gradle is installed. run gradle
     echo $(./gradlew --status)
     # check if grobid is running
-    response=$(curl http://grobid:8070/api/version)
+    response=$(curl http://localhost:8070/api/version)
     if [[ "$response" == "200" ]]; then
       cd /
       echo "python"
