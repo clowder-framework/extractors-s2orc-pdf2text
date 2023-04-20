@@ -40,25 +40,28 @@ def process_pdf_stream(input_file: str, sha: str, input_stream: bytes, grobid_co
 
 def process_pdf_file(
         input_file: str,
+        input_filename :str,
         temp_dir: str = BASE_TEMP_DIR,
         output_dir: str = BASE_OUTPUT_DIR,
         grobid_config: Optional[Dict] = None
 ) -> str:
     """
     Process a PDF file and get JSON representation
-    :param input_file:
+    :param input_file: input file resource
+    :param input_filename: input filename resource
     :param temp_dir:
     :param output_dir:
-    :return:
+    :return: json output file
     """
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
-    # get paper id as the name of the file
-    paper_id = '.'.join(input_file.split('/')[-1].split('.')[:-1])
-    tei_file = os.path.join(temp_dir, f'{paper_id}.tei.xml')
-    output_file = os.path.join(output_dir, f'{paper_id}.json')
-    log.info("Files %s, %s, %s", paper_id, tei_file, output_file)
+    # check typeof input file
+    log.info("Type of input file %s" %type(input_file))
+    # filenames for tei and json outputs
+    tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
+    output_file = os.path.join(output_dir, f'{input_filename}.json')
+    log.info("Files %s, %s, %s", input_filename, tei_file, output_file)
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):

@@ -51,19 +51,14 @@ class TextExtractor(Extractor):
 
         temp_dir = BASE_TEMP_DIR
         output_dir = BASE_OUTPUT_DIR
-        # get paper id as the name of the file
-        paper_id = '.'.join(input_filename.split('/')[-1].split('.')[:-1])
-        tei_file = os.path.join(temp_dir, f'{paper_id}.tei.xml')
-        output_file = os.path.join(output_dir, f'{paper_id}.json')
 
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
 
         # process pdf file
         start_time = time.time()
-        input_filename = resource["name"]
-        processed_output_file = process_pdf_file(input_file, temp_dir, output_dir)
-        log.info("Processed output file " % processed_output_file)
+        output_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
+        log.info("JSON output file " % output_file)
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
         log.info('done.')
