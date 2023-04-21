@@ -134,6 +134,7 @@ class GrobidClient(ApiClient):
         # we use ntpath here to be sure it will work on Windows too
         #pdf_file_name = ntpath.basename(pdf_file)
         filename = os.path.join(output, os.path.splitext(input_filename)[0] + '.tei.xml')
+        log.info("TEI filename ", filename)
         if os.path.isfile(filename):
             return
 
