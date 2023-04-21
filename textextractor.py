@@ -9,7 +9,7 @@ from pyclowder.extractors import Extractor
 import pyclowder.files
 
 from doc2txt.grobid2json.process_pdf import process_pdf_file
-import doc2txt.json2txt as json2txt
+
 
 
 # create log object with current module name
@@ -56,12 +56,7 @@ class TextExtractor(Extractor):
 
         # process pdf file
         start_time = time.time()
-        output_xml_file, output_json_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
-        # extract text field from json
-        output_txt = json2txt.process_json(output_json_file, "text")
-        txt_file = open(output_txt_file, 'w')
-        for text in output_txt:
-            txt_file.write(text + "\n")
+        output_xml_file, output_json_file, output_txt_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
 
         log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_txt_file)
 

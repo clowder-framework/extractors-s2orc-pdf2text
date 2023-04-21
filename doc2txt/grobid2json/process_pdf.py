@@ -8,6 +8,7 @@ from typing import Optional, Dict
 
 from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
 from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
+from doc2txt.json2txt import process_json
 
 
 # create log object with current module name
@@ -41,14 +42,14 @@ def process_pdf_file(
         temp_dir: str,
         output_dir: str,
         grobid_config: Optional[Dict] = None
-) -> [str, str]:
+) -> [str, str, str]:
     """
     Process a PDF file and get JSON representation
     :param input_file: input file resource
     :param input_filename: input filename resource
     :param temp_dir:
     :param output_dir:
-    :return: xml output file, json output file
+    :return: xml output file, json output file, txt output file
     """
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
@@ -56,6 +57,7 @@ def process_pdf_file(
     # filenames for tei and json outputs
     tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
     json_file = os.path.join(output_dir, f'{input_filename}.json')
+    txt_file = os.path.join(output_dir, f'{input_filename}.txt')
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):
@@ -77,7 +79,13 @@ def process_pdf_file(
     with open(json_file, 'w') as outf:
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
-    return tei_file, json_file
+    # extract text field from json
+    output_txt = process_json(json_file, "text")
+    txt_file = open(txt_file, 'w')
+    for text in output_txt:
+        txt_file.write(text + "\n")
+
+    return tei_file, json_file, txt_file
 
 
 if __name__ == '__main__':
