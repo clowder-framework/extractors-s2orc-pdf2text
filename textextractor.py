@@ -86,7 +86,7 @@ class TextExtractor(Extractor):
 
 if __name__ == "__main__":
     # # for testing
-    process_pdf_file("tests/pdf/N18-3011.pdf", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
+    process_pdf_file("tests/pdf/N18-3011.pdf", "N18-3011", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
 
     #extractor = TextExtractor()
     #extractor.start()
