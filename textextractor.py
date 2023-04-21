@@ -9,9 +9,9 @@ import os
 from pyclowder.extractors import Extractor
 import pyclowder.files
 
-from doc2json.grobid2json.process_pdf import process_pdf_file
-#from doc2json.grobid2json.grobid.grobid_client import GrobidClient
-#from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json
+from doc2txt.grobid2json.process_pdf import process_pdf_file
+#from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
+#from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json
 
 
 # create log object with current module name
