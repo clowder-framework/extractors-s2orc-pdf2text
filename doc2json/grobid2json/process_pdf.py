@@ -51,7 +51,7 @@ def process_pdf_file(
     :param input_filename: input filename resource
     :param temp_dir:
     :param output_dir:
-    :return: json output file
+    :return: xml output file, json output file
     """
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
@@ -64,7 +64,7 @@ def process_pdf_file(
     if not os.path.exists(input_file):
         raise FileNotFoundError(f"{input_file} doesn't exist")
     if os.path.exists(json_file):
-        print(f'{json_file} already exists!')
+        log.warning(f'{json_file} already exists!')
 
     # process PDF through Grobid -> TEI.XML
     client = GrobidClient(grobid_config)
