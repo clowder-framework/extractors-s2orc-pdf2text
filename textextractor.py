@@ -57,7 +57,7 @@ class TextExtractor(Extractor):
         # process pdf file
         start_time = time.time()
         output_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
-        log.info("JSON output file " % output_file)
+        log.info("JSON output file %s", output_file)
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
         log.info('done.')
