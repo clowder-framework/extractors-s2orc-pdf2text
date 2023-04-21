@@ -120,11 +120,12 @@ class GrobidClient(ApiClient):
 
         if status == 503:
             time.sleep(self.sleep_time)
+            log.info("sleep for process pdf stream")
             return self.process_pdf_stream(pdf_file, pdf_strm, service)
         elif status != 200:
             with open(os.path.join(output, "failed.log"), "a+") as failed:
                 failed.write(pdf_file.strip(".pdf") + "\n")
-            print('Processing failed with error ' + str(status))
+            log.info('Processing failed with error %s', str(status))
             return ""
         else:
             return res.text
@@ -134,19 +135,23 @@ class GrobidClient(ApiClient):
         # we use ntpath here to be sure it will work on Windows too
         #pdf_file_name = ntpath.basename(pdf_file)
         filename = os.path.join(output, os.path.splitext(input_filename)[0] + '.tei.xml')
-        log.info("TEI filename ", filename)
+        log.info("TEI filename %s", filename)
         if os.path.isfile(filename):
             return
 
         log.info("PDF File to process in path %s with name %s", pdf_file, input_filename)
         pdf_strm = open(pdf_file, 'rb').read()
-        tei_text = self.process_pdf_stream(pdf_file, pdf_strm, output, service)
+        tei_text = self.process_pdf_stream(input_filename, pdf_strm, output, service)
 
         # writing TEI file
         if tei_text:
             with io.open(filename, 'w+', encoding='utf8') as tei_file:
                 log.info("writing to tei file %s", tei_file)
                 tei_file.write(tei_text)
+            assert os.path.exists(filename)
+        else:
+            log.error("TEI file error")
+
 
     def process_citation(self, bib_string: str, log_file: str) -> str:
         # process citation raw string and return corresponding dict

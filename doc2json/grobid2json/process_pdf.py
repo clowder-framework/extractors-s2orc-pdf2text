@@ -74,7 +74,7 @@ def process_pdf_file(
     client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")
 
     # process TEI.XML -> JSON
-    log.info("TEI File ", tei_file)
+    log.info("TEI File %s", tei_file)
     assert os.path.exists(tei_file)
     paper = convert_tei_xml_file_to_s2orc_json(tei_file)
 
