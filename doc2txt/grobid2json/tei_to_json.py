@@ -7,12 +7,12 @@ import re
 from bs4 import BeautifulSoup, NavigableString
 from typing import List, Dict, Tuple
 
-from doc2json.s2orc import Paper
+from doc2txt.s2orc import Paper
 
-from doc2json.utils.grobid_util import parse_bib_entry, extract_paper_metadata_from_grobid_xml
-from doc2json.utils.citation_util import SINGLE_BRACKET_REGEX, BRACKET_REGEX, BRACKET_STYLE_THRESHOLD
-from doc2json.utils.citation_util import is_expansion_string, _clean_empty_and_duplicate_authors_from_grobid_parse
-from doc2json.utils.refspan_util import sub_spans_and_update_indices
+from doc2txt.utils.grobid_util import parse_bib_entry, extract_paper_metadata_from_grobid_xml
+from doc2txt.utils.citation_util import SINGLE_BRACKET_REGEX, BRACKET_REGEX, BRACKET_STYLE_THRESHOLD
+from doc2txt.utils.citation_util import is_expansion_string, _clean_empty_and_duplicate_authors_from_grobid_parse
+from doc2txt.utils.refspan_util import sub_spans_and_update_indices
 
 
 REPLACE_TABLE_TOKS = {

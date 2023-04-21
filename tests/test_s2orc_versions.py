@@ -2,7 +2,7 @@ import os
 import unittest
 import json
 
-from doc2json.s2orc import load_s2orc
+from doc2txt.s2orc import load_s2orc
 
 TEST_S2ORC_INPUT_DATA = os.path.join('tests', 's2orc')
 TEST_S2ORC_CURRENT = os.path.join(TEST_S2ORC_INPUT_DATA, '20210101')

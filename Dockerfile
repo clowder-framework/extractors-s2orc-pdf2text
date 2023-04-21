@@ -1,6 +1,6 @@
 FROM python:3.10
 
-COPY doc2txt ./doc2json
+COPY doc2txt ./doc2txt
 COPY tests ./tests
 COPY build_run.sh setup.py textextractor.py requirements.txt extractor_info.json ./
 

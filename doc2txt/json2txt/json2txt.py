@@ -1,6 +1,5 @@
 # Convert json to text
 
-import os
 import json
 import logging
 

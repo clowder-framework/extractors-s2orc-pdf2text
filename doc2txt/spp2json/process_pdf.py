@@ -4,8 +4,8 @@ import argparse
 import time
 from typing import Dict
 
-from doc2json.spp2json.spp.spp_client import SppClient
-from doc2json.spp2json.spp.spp_json_to_s2orc_json import convert_spp_json_to_s2orc_json
+from doc2txt.spp2json.spp.spp_client import SppClient
+from doc2txt.spp2json.spp.spp_json_to_s2orc_json import convert_spp_json_to_s2orc_json
 
 
 

@@ -3,7 +3,6 @@
 
 import time
 import logging
-import json
 import os
 
 from pyclowder.extractors import Extractor
