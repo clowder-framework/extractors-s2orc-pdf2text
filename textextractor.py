@@ -5,12 +5,10 @@ import time
 import logging
 import os
 
-from pyclowder.extractors import Extractor
-import pyclowder.files
-
 from doc2txt.grobid2json.process_pdf import process_pdf_file
 
-
+from pyclowder.extractors import Extractor
+import pyclowder.files
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -80,8 +78,8 @@ class TextExtractor(Extractor):
 
 
 if __name__ == "__main__":
-    # # for testing
-    process_pdf_file("tests/pdf/N18-3011.pdf", "N18-3011", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
+    # uncomment for testing
+    #process_pdf_file("tests/pdf/N18-3011.pdf", "N18-3011", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
 
-    #extractor = TextExtractor()
-    #extractor.start()
+    extractor = TextExtractor()
+    extractor.start()
