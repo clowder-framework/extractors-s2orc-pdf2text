@@ -6,8 +6,8 @@ import logging
 from bs4 import BeautifulSoup
 from typing import Optional, Dict
 
-from doc2json.grobid2json.grobid.grobid_client import GrobidClient
-from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
+from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
+from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
 
 
 # create log object with current module name
