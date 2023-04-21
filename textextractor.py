@@ -56,24 +56,25 @@ class TextExtractor(Extractor):
 
         # process pdf file
         start_time = time.time()
-        output_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
-        log.info("JSON output file %s", output_file)
+        output_xml_file, output_json_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
+        log.info("Output files : %s, %s", output_xml_file, output_json_file)
+
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
-        log.info('done.')
-        connector.message_process(resource, "Pdf to text conversion finished...")
+        connector.message_process(resource, "Pdf to text conversion finished.")
 
         # clean existing duplicate
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
         for file in files_in_dataset:
-            if file["filename"] == output_file:
+            if file["filename"] == output_json_file or file["filename"] == output_xml_file:
                 url = '%sapi/files/%s?key=%s' % (host, file["id"], secret_key)
                 connector.delete(url, verify=connector.ssl_verify if connector else True)
-        connector.message_process(resource, "Check for duplicate...")
+        connector.message_process(resource, "Check for duplicate files...")
 
         # upload to clowder
-        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_file)
-        connector.message_process(resource, "Upload processed file to Clowder...")
+        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_json_file)
+        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
+        connector.message_process(resource, "Uploading output files to Clowder...")
 
 
 if __name__ == "__main__":

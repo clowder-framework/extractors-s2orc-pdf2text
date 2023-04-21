@@ -58,14 +58,13 @@ def process_pdf_file(
 
     # filenames for tei and json outputs
     tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
-    output_file = os.path.join(output_dir, f'{input_filename}.json')
-    log.info("Files %s, %s, %s", input_filename, tei_file, output_file)
+    json_file = os.path.join(output_dir, f'{input_filename}.json')
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):
         raise FileNotFoundError(f"{input_file} doesn't exist")
-    if os.path.exists(output_file):
-        print(f'{output_file} already exists!')
+    if os.path.exists(json_file):
+        print(f'{json_file} already exists!')
 
     # process PDF through Grobid -> TEI.XML
     client = GrobidClient(grobid_config)
@@ -74,15 +73,14 @@ def process_pdf_file(
     client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")
 
     # process TEI.XML -> JSON
-    log.info("TEI File %s", tei_file)
     assert os.path.exists(tei_file)
     paper = convert_tei_xml_file_to_s2orc_json(tei_file)
 
     # write to file
-    with open(output_file, 'w') as outf:
+    with open(json_file, 'w') as outf:
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
-    return output_file
+    return tei_file, json_file
 
 
 if __name__ == '__main__':
