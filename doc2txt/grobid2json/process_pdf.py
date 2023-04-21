@@ -8,7 +8,7 @@ from typing import Optional, Dict
 
 from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
 from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
-from doc2txt.json2txt import process_json
+from doc2txt.json2txt.json2txt import process_json
 
 
 # create log object with current module name
