@@ -134,7 +134,7 @@ class GrobidClient(ApiClient):
         # check if TEI file is already produced
         # we use ntpath here to be sure it will work on Windows too
         #pdf_file_name = ntpath.basename(pdf_file)
-        filename = os.path.join(output, os.path.splitext(input_filename)[0] + '.tei.xml')
+        filename = os.path.join(output, input_filename + '.tei.xml')
         log.info("TEI filename %s", filename)
         if os.path.isfile(filename):
             return
@@ -148,9 +148,8 @@ class GrobidClient(ApiClient):
             with io.open(filename, 'w+', encoding='utf8') as tei_file:
                 log.info("writing to tei file %s", tei_file)
                 tei_file.write(tei_text)
-            assert os.path.exists(filename)
         else:
-            log.error("TEI file error")
+            log.error("TEI processing unsuccessful")
 
 
     def process_citation(self, bib_string: str, log_file: str) -> str:
