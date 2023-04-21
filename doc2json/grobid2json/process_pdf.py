@@ -56,8 +56,6 @@ def process_pdf_file(
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
-    # check typeof input file
-    log.info("Type of input file %s" %type(input_file))
     # filenames for tei and json outputs
     tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
     output_file = os.path.join(output_dir, f'{input_filename}.json')
@@ -73,7 +71,7 @@ def process_pdf_file(
     client = GrobidClient(grobid_config)
     # TODO: compute PDF hash
     # TODO: add grobid version number to output
-    client.process_pdf(input_file, temp_dir, "processFulltextDocument")
+    client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")
 
     # process TEI.XML -> JSON
     assert os.path.exists(tei_file)

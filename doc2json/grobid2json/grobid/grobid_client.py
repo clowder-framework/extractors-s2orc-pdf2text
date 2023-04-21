@@ -129,15 +129,15 @@ class GrobidClient(ApiClient):
         else:
             return res.text
 
-    def process_pdf(self, pdf_file: str, output: str, service: str) -> None:
+    def process_pdf(self, pdf_file: str, input_filename: str, output: str, service: str) -> None:
         # check if TEI file is already produced
         # we use ntpath here to be sure it will work on Windows too
-        pdf_file_name = ntpath.basename(pdf_file)
-        filename = os.path.join(output, os.path.splitext(pdf_file_name)[0] + '.tei.xml')
+        #pdf_file_name = ntpath.basename(pdf_file)
+        filename = os.path.join(output, os.path.splitext(input_filename)[0] + '.tei.xml')
         if os.path.isfile(filename):
             return
 
-        log.info("PDF File to process is %s", pdf_file)
+        log.info("PDF File to process in path %s with name %s", pdf_file, input_filename)
         pdf_strm = open(pdf_file, 'rb').read()
         tei_text = self.process_pdf_stream(pdf_file, pdf_strm, output, service)
 

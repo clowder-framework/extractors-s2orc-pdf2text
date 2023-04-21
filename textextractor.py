@@ -5,8 +5,6 @@ import time
 import logging
 import json
 import os
-from typing import Optional, Dict
-import logging
 
 from pyclowder.extractors import Extractor
 import pyclowder.files
@@ -42,13 +40,13 @@ class TextExtractor(Extractor):
     def process_message(self, connector, host, secret_key, resource, parameters):
         # Process the file and upload the results
         # uncomment to see the resource
-        log.info("RESOURCE")
-        log.info(resource)
+        # {'type': 'file', 'id': '6435b226e4b02b1506038ec5', 'intermediate_id': '6435b226e4b02b1506038ec5', 'name': 'N18-3011.pdf', 'file_ext': '.pdf', 'parent': {'type': 'dataset', 'id': '64344255e4b0a99d8062e6e0'}, 'local_paths': ['/tmp/tmp2hw6l5ra.pdf']}
+        #log.info(resource)
 
         input_file = resource["local_paths"][0]
         input_file_id = resource['id']
         dataset_id = resource['parent'].get('id')
-        input_filename = resource["name"]
+        input_filename = os.path.splitext(os.path.basename(resource["name"]))[0]
 
         temp_dir = BASE_TEMP_DIR
         output_dir = BASE_OUTPUT_DIR
