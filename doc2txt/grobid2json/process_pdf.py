@@ -9,9 +9,6 @@ from typing import Optional, Dict
 from doc2json.grobid2json.grobid.grobid_client import GrobidClient
 from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
 
-BASE_TEMP_DIR = 'temp'
-BASE_OUTPUT_DIR = 'output'
-BASE_LOG_DIR = 'log'
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -41,10 +38,10 @@ def process_pdf_stream(input_file: str, sha: str, input_stream: bytes, grobid_co
 def process_pdf_file(
         input_file: str,
         input_filename :str,
-        temp_dir: str = BASE_TEMP_DIR,
-        output_dir: str = BASE_OUTPUT_DIR,
+        temp_dir: str,
+        output_dir: str,
         grobid_config: Optional[Dict] = None
-) -> str:
+) -> [str, str]:
     """
     Process a PDF file and get JSON representation
     :param input_file: input file resource
