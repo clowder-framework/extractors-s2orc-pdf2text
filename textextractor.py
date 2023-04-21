@@ -42,7 +42,8 @@ class TextExtractor(Extractor):
     def process_message(self, connector, host, secret_key, resource, parameters):
         # Process the file and upload the results
         # uncomment to see the resource
-        # print(resource)
+        log.info("RESOURCE")
+        log.info(resource)
 
         input_file = resource["local_paths"][0]
         input_file_id = resource['id']
