@@ -81,11 +81,11 @@ def process_pdf_file(
     with open(json_file, 'w') as outf:
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
-    # extract text field from json
+    # extract text field from json and write to file
     output_txt = process_json(json_file, "text")
-    txt_file = open(txt_file, 'w')
-    for text in output_txt:
-        txt_file.write(text + "\n")
+    with open(txt_file, 'w') as outfile:
+        for text in output_txt:
+            outfile.write(f"{text}\n")
 
     return tei_file, json_file, txt_file
 
