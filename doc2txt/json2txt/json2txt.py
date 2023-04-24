@@ -19,6 +19,8 @@ def process_json(input_file, key):
     """
     json_file = open(input_file)
     json_data = json.load(json_file)  # load json object to a dictionary
+    # if using grobid, one can also use the pdf_parse key. uncomment below if needed
+    # json_data = json_data["pdf_parse"]
     output = []
     for i in item_generator(json_data, key):
         output.append(i)
