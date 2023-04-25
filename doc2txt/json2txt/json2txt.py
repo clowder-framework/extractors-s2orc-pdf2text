@@ -22,14 +22,16 @@ def process_json(input_file, key):
     # if using grobid, one can also use the pdf_parse key and title key.
     title_text = json_data["title"]
     pdf_json_data = json_data["pdf_parse"]
-    abstract_text = pdf_json_data["abstract"]["text"]
-    body_text = pdf_json_data["body_text"]
+    abstract_data = pdf_json_data["abstract"]
+    body_data = pdf_json_data["body_text"]
     output = []
-    # append abstract and title text to output
+    # append title text to output
     output.append(title_text)
-    output.append(abstract_text)
-    # append text in body
-    for i in item_generator(body_text, key):
+    # append abstract text in body
+    for i in item_generator(abstract_data, key):
+        output.append(i)
+    # append body text in body
+    for i in item_generator(body_data, key):
         output.append(i)
 
     json_file.close()
