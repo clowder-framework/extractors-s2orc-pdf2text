@@ -110,7 +110,7 @@ if __name__ == '__main__':
     os.makedirs(output_path, exist_ok=True)
 
     input_filename = os.path.splitext(os.path.basename(input_path))[0]
-    process_pdf_file(input_path, input_filename, temp_path, output_path)
+    tei_file, json_file, txt_file = process_pdf_file(input_path, input_filename, temp_path, output_path)
 
     runtime = round(time.time() - start_time, 3)
     print("runtime: %s seconds " % (runtime))
