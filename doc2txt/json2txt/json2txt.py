@@ -19,10 +19,17 @@ def process_json(input_file, key):
     """
     json_file = open(input_file)
     json_data = json.load(json_file)  # load json object to a dictionary
-    # if using grobid, one can also use the pdf_parse key. uncomment below if needed
-    # json_data = json_data["pdf_parse"]
+    # if using grobid, one can also use the pdf_parse key and title key.
+    title_text = json_data["title"]
+    pdf_json_data = json_data["pdf_parse"]
+    abstract_text = pdf_json_data["abstract"]["text"]
+    body_text = pdf_json_data["body_text"]
     output = []
-    for i in item_generator(json_data, key):
+    # append abstract and title text to output
+    output.append(title_text)
+    output.append(abstract_text)
+    # append text in body
+    for i in item_generator(body_text, key):
         output.append(i)
 
     json_file.close()
@@ -45,7 +52,9 @@ def item_generator(json_data, lookup_key):
             if k == lookup_key:
                 yield v
             else:
-                yield from item_generator(v, lookup_key)
+                # yield from item_generator(v, lookup_key)
+                # no nested lookups. only text in the first dictionary items is appended to output
+                pass
     elif isinstance(json_data, list):
         for item in json_data:
             yield from item_generator(item, lookup_key)
