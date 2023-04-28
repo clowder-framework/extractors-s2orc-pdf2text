@@ -5,7 +5,9 @@ import json
 import argparse
 import time
 import logging
-from docx_utils.flatten import opc_to_flat_opc
+#from docx_utils.flatten import opc_to_flat_opc
+import docx
+from simplify_docx import simplify
 
 from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
 from doc2txt.json2txt.json2txt import process_json
@@ -21,7 +23,7 @@ def process_docx_file(
         input_filename :str,
         temp_dir: str,
         output_dir: str
-) -> [str, str, str]:
+) -> [str, str]:
     """
      Process Office Open XML (docx) file and get JSON representation. Extract the text from the JSON representation and write to a txt file
     :param input_file: input file resource
@@ -35,7 +37,6 @@ def process_docx_file(
     os.makedirs(output_dir, exist_ok=True)
 
     # filenames for tei and json outputs
-    tei_xml_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
     json_file = os.path.join(output_dir, f'{input_filename}.json')
     txt_file = os.path.join(output_dir, f'{input_filename}.txt')
 
@@ -45,12 +46,17 @@ def process_docx_file(
     if os.path.exists(json_file):
         log.warning(f'{json_file} already exists!')
 
-    opc_to_flat_opc(input_file, tei_xml_file)
-    paper = convert_tei_xml_file_to_s2orc_json(tei_xml_file)
+    #opc_to_flat_opc(input_file, tei_xml_file)
+    # paper = convert_tei_xml_file_to_s2orc_json(tei_xml_file)
+
+    # read document
+    doc_file = docx.Document(input_file)
+    # coerce to JSON using the standard options
+    doc_as_json = simplify(doc_file)
 
     # write to file
     with open(json_file, 'w') as outf:
-        json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
+        json.dump(doc_as_json, outf, indent=4, sort_keys=False)
 
     # extract text field from json and write to file
     output_txt = process_json(json_file, "text")
@@ -58,7 +64,7 @@ def process_docx_file(
         for text in output_txt:
             outfile.write(f"{text}\n")
 
-    return tei_xml_file, json_file, txt_file
+    return json_file, txt_file
 
 
 if __name__ == '__main__':
@@ -81,7 +87,7 @@ if __name__ == '__main__':
     os.makedirs(output_path, exist_ok=True)
 
     input_filename = os.path.splitext(os.path.basename(input_path))[0]
-    tei_xml_file, json_file, txt_file = process_docx_file(input_path, input_filename, temp_path, output_path)
+    json_file, txt_file = process_docx_file(input_path, input_filename, temp_path, output_path)
 
     runtime = round(time.time() - start_time, 3)
     print("runtime: %s seconds " % (runtime))
