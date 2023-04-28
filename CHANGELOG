@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - AllenAI s2orc-doc2json as a clowder extractor. [#3](https://github.com/clowder-framework/text-extractor/issues/3)
+- Conversion of json output to text. [#8](https://github.com/clowder-framework/text-extractor/issues/8)
 
 ### Changed
 
 
 ### Fixed
+- Output json filename changed to same name as input file. [#6](https://github.com/clowder-framework/text-extractor/issues/6)
 

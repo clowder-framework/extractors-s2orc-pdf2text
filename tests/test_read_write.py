@@ -2,7 +2,7 @@ import os
 import unittest
 import json
 
-from doc2json.s2orc import load_s2orc
+from doc2txt.s2orc import load_s2orc
 
 JSON_INPUT_DATA = os.path.join('tests', 'pdf', 'N18-3011.json')
 

@@ -5,7 +5,7 @@ import argparse
 import time
 import glob
 import logging
-from doc2json.grobid2json.grobid.client import ApiClient
+from doc2txt.grobid2json.grobid.client import ApiClient
 import ntpath
 from typing import List
 
@@ -124,28 +124,31 @@ class GrobidClient(ApiClient):
         elif status != 200:
             with open(os.path.join(output, "failed.log"), "a+") as failed:
                 failed.write(pdf_file.strip(".pdf") + "\n")
-            print('Processing failed with error ' + str(status))
+            log.error('Processing failed with error %s', str(status))
             return ""
         else:
             return res.text
 
-    def process_pdf(self, pdf_file: str, output: str, service: str) -> None:
+    def process_pdf(self, pdf_file: str, input_filename: str, output: str, service: str) -> None:
         # check if TEI file is already produced
         # we use ntpath here to be sure it will work on Windows too
-        pdf_file_name = ntpath.basename(pdf_file)
-        filename = os.path.join(output, os.path.splitext(pdf_file_name)[0] + '.tei.xml')
+        #pdf_file_name = ntpath.basename(pdf_file)
+        filename = os.path.join(output, input_filename + '.tei.xml')
         if os.path.isfile(filename):
             return
 
-        log.info("PDF File to process is %s", pdf_file)
+        log.info("Processing pdf file in path %s with name %s", pdf_file, input_filename)
         pdf_strm = open(pdf_file, 'rb').read()
-        tei_text = self.process_pdf_stream(pdf_file, pdf_strm, output, service)
+        tei_text = self.process_pdf_stream(input_filename, pdf_strm, output, service)
 
         # writing TEI file
         if tei_text:
             with io.open(filename, 'w+', encoding='utf8') as tei_file:
-                log.info("writing to tei file %s", tei_file)
+                log.info("Writing to tei file %s", tei_file)
                 tei_file.write(tei_text)
+        else:
+            log.error("TEI processing unsuccessful")
+
 
     def process_citation(self, bib_string: str, log_file: str) -> str:
         # process citation raw string and return corresponding dict

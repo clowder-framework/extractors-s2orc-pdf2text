@@ -1,26 +1,24 @@
 {
   "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
-  "name": "textextractor",
-  "version": "0.1",
-  "description": "extracts text from pdf files",
+  "name": "extractors-pdf2text",
+  "version": "0.4",
+  "description": "Extracts text from pdf files. Creates an xml, json and txt file and uploads to Clowder dataset. Uses Grobid service and AllenAI s2orc-doc2json",
   "author": "Mathew, Minu <minum@illinois.edu>; Lo, Kyle  and Wang, Lucy Lu  and Neumann, Mark  and Kinney, Rodney  and Weld, Daniel",
   "contributors": [],
   "contexts": [{}],
   "repository": [
     {
       "repType": "git",
-      "repUrl": "https://github.com/clowder-framework/text-extractor"
+      "repUrl": "https://github.com/clowder-framework/extractors-s2orc-pdf2text"
     }
   ],
   "process": {
     "file": [
-      "application/pdf",
-      "application/*",
-      "text/plain"
+      "application/pdf"
     ]
   },
   "external_services": [],
   "dependencies": [],
   "bibtex": [],
-  "labels": ["Type/Any"]
+  "labels": ["Type/PDF"]
 }

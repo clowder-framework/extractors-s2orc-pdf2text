@@ -2,7 +2,7 @@
 import setuptools
 
 setuptools.setup(
-    name='doc2json',
+    name='doc2txt',
     version='0.1',
     packages=setuptools.find_packages(),
     install_requires=[

@@ -4,7 +4,7 @@ S2ORC classes
 
 from datetime import datetime
 from typing import Dict, List, Optional
-from doc2json.config import *
+from doc2txt.config import *
 
 
 CORRECT_KEYS = {

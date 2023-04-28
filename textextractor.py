@@ -3,18 +3,12 @@
 
 import time
 import logging
-import json
 import os
-from typing import Optional, Dict
-import logging
+
+from doc2txt.grobid2json.process_pdf import process_pdf_file
 
 from pyclowder.extractors import Extractor
 import pyclowder.files
-
-from doc2json.grobid2json.process_pdf import process_pdf_file
-#from doc2json.grobid2json.grobid.grobid_client import GrobidClient
-#from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json
-
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -42,47 +36,50 @@ class TextExtractor(Extractor):
     def process_message(self, connector, host, secret_key, resource, parameters):
         # Process the file and upload the results
         # uncomment to see the resource
-        # print(resource)
+        # log.info(resource)
+        # {'type': 'file', 'id': '6435b226e4b02b1506038ec5', 'intermediate_id': '6435b226e4b02b1506038ec5', 'name': 'N18-3011.pdf', 'file_ext': '.pdf', 'parent': {'type': 'dataset', 'id': '64344255e4b0a99d8062e6e0'}, 'local_paths': ['/tmp/tmp2hw6l5ra.pdf']}
 
         input_file = resource["local_paths"][0]
         input_file_id = resource['id']
         dataset_id = resource['parent'].get('id')
+        input_filename = os.path.splitext(os.path.basename(resource["name"]))[0]
 
         temp_dir = BASE_TEMP_DIR
-        output_dir = BASE_OUTPUT_DIR
-        # get paper id as the name of the file
-        paper_id = '.'.join(input_file.split('/')[-1].split('.')[:-1])
-        tei_file = os.path.join(temp_dir, f'{paper_id}.tei.xml')
-        output_file = os.path.join(output_dir, f'{paper_id}.json')
+        output_dir= BASE_OUTPUT_DIR
+        # filenames for txt output
+        output_txt_file = os.path.join(output_dir, f'{input_filename}.txt')
 
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
 
         # process pdf file
         start_time = time.time()
-        input_filename = resource["name"]
-        processed_output_file = process_pdf_file(input_file, temp_dir, output_dir)
+        output_xml_file, output_json_file, output_txt_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
+
+        log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_txt_file)
+
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
-        log.info('done.')
-        connector.message_process(resource, "Pdf to text conversion finished...")
+        connector.message_process(resource, "Pdf to text conversion finished.")
 
         # clean existing duplicate
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
         for file in files_in_dataset:
-            if file["filename"] == output_file:
+            if file["filename"] == output_json_file or file["filename"] == output_xml_file:
                 url = '%sapi/files/%s?key=%s' % (host, file["id"], secret_key)
                 connector.delete(url, verify=connector.ssl_verify if connector else True)
-        connector.message_process(resource, "Check for duplicate...")
+        connector.message_process(resource, "Check for duplicate files...")
 
         # upload to clowder
-        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_file)
-        connector.message_process(resource, "Upload processed file to Clowder...")
+        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_json_file)
+        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
+        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_txt_file)
+        connector.message_process(resource, "Uploading output files to Clowder...")
 
 
 if __name__ == "__main__":
-    # # for testing
-    #process_pdf_file("tests/pdf/N18-3011.pdf", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
+    # uncomment for testing
+    #process_pdf_file("tests/pdf/N18-3011.pdf", "N18-3011", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
 
     extractor = TextExtractor()
     extractor.start()
