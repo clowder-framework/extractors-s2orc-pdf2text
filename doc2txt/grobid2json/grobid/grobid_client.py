@@ -5,7 +5,7 @@ import argparse
 import time
 import glob
 import logging
-from doc2json.grobid2json.grobid.client import ApiClient
+from doc2txt.grobid2json.grobid.client import ApiClient
 import ntpath
 from typing import List
 

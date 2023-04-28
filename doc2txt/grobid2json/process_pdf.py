@@ -6,12 +6,12 @@ import logging
 from bs4 import BeautifulSoup
 from typing import Optional, Dict
 
-from doc2json.grobid2json.grobid.grobid_client import GrobidClient
-from doc2json.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
+from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
+from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
+from doc2txt.json2txt.json2txt import process_json
 
 BASE_TEMP_DIR = 'temp'
 BASE_OUTPUT_DIR = 'output'
-BASE_LOG_DIR = 'log'
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -41,17 +41,17 @@ def process_pdf_stream(input_file: str, sha: str, input_stream: bytes, grobid_co
 def process_pdf_file(
         input_file: str,
         input_filename :str,
-        temp_dir: str = BASE_TEMP_DIR,
-        output_dir: str = BASE_OUTPUT_DIR,
+        temp_dir: str,
+        output_dir: str,
         grobid_config: Optional[Dict] = None
-) -> str:
+) -> [str, str, str]:
     """
     Process a PDF file and get JSON representation
     :param input_file: input file resource
     :param input_filename: input filename resource
     :param temp_dir:
     :param output_dir:
-    :return: xml output file, json output file
+    :return: xml output file, json output file, txt output file
     """
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
@@ -59,6 +59,7 @@ def process_pdf_file(
     # filenames for tei and json outputs
     tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
     json_file = os.path.join(output_dir, f'{input_filename}.json')
+    txt_file = os.path.join(output_dir, f'{input_filename}.txt')
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):
@@ -80,14 +81,20 @@ def process_pdf_file(
     with open(json_file, 'w') as outf:
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
-    return tei_file, json_file
+    # extract text field from json and write to file
+    output_txt = process_json(json_file, "text")
+    with open(txt_file, 'w') as outfile:
+        for text in output_txt:
+            outfile.write(f"{text}\n")
+
+    return tei_file, json_file, txt_file
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run S2ORC PDF2JSON")
     parser.add_argument("-i", "--input", default=None, help="path to the input PDF file")
     parser.add_argument("-t", "--temp", default=BASE_TEMP_DIR, help="path to the temp dir for putting tei xml files")
-    parser.add_argument("-o", "--output", default=BASE_OUTPUT_DIR, help="path to the output dir for putting json files")
+    parser.add_argument("-o", "--output", default=BASE_OUTPUT_DIR, help="path to the output dir for putting json and txt files")
     parser.add_argument("-k", "--keep", action='store_true')
 
     args = parser.parse_args()
@@ -102,7 +109,8 @@ if __name__ == '__main__':
     os.makedirs(temp_path, exist_ok=True)
     os.makedirs(output_path, exist_ok=True)
 
-    process_pdf_file(input_path, temp_path, output_path)
+    input_filename = os.path.splitext(os.path.basename(input_path))[0]
+    tei_file, json_file, txt_file = process_pdf_file(input_path, input_filename, temp_path, output_path)
 
     runtime = round(time.time() - start_time, 3)
     print("runtime: %s seconds " % (runtime))
