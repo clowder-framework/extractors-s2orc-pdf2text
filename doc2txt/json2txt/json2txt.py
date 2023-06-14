@@ -7,13 +7,12 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def process_json(input_file, key):
+def process_json(input_file):
     """
     Method to convert json file to text.
-    Extracts data from the key field and return a list of strings as text
+    Extracts data from specific json fields and return a list of strings as text
     Args:
         input_file (str): Json input file
-        key (str): Json field key to extract data
     Returns:
         output (list): List of text data extracted from json
     """
@@ -25,10 +24,12 @@ def process_json(input_file, key):
     abstract_data = pdf_json_data["abstract"]
     body_data = pdf_json_data["body_text"]
     output = []
+    # fields to be extracted from json file
+    body_text_fields = ["text", "section"]
     # append title text to output
     output.append(title_text)
     # append abstract text in body
-    for i in item_generator(abstract_data, key):
+    for i in item_generator(abstract_data, "text"):
         output.append(i)
     # append body text in body
     for i in item_generator(body_data, key):

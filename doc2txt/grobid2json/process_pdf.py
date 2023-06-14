@@ -81,8 +81,8 @@ def process_pdf_file(
     with open(json_file, 'w') as outf:
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
-    # extract text field from json and write to file
-    output_txt = process_json(json_file, "text")
+    # extract fields from json and write to file
+    output_txt = process_json(json_file)
     with open(txt_file, 'w') as outfile:
         for text in output_txt:
             outfile.write(f"{text}\n")
