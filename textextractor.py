@@ -18,7 +18,7 @@ BASE_OUTPUT_DIR = 'output'
 BASE_LOG_DIR = 'log'
 
 
-class TextExtractor(Extractor):
+class Pdf2TextExtractor(Extractor):
     def __init__(self):
         Extractor.__init__(self)
 
@@ -46,8 +46,7 @@ class TextExtractor(Extractor):
 
         temp_dir = BASE_TEMP_DIR
         output_dir= BASE_OUTPUT_DIR
-        # filenames for txt output
-        output_txt_file = os.path.join(output_dir, f'{input_filename}.txt')
+
 
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
@@ -81,5 +80,5 @@ if __name__ == "__main__":
     # uncomment for testing
     #process_pdf_file("tests/pdf/N18-3011.pdf", "N18-3011", BASE_TEMP_DIR, BASE_OUTPUT_DIR)
 
-    extractor = TextExtractor()
+    extractor = Pdf2TextExtractor()
     extractor.start()
