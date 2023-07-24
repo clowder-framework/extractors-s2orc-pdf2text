@@ -14,4 +14,4 @@ ENV PYTHONPATH=./
 
 EXPOSE 8070
 
-CMD ["python3","textextractor.py", "--heartbeat", "40"]
+CMD ["python3","pdf2text.py", "--heartbeat", "40"]
