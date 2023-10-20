@@ -32,6 +32,8 @@ DEFAULT_GROBID_CONFIG = {
     "consolidate_citations": False,
     "include_raw_citations": True,
     "include_raw_affiliations": False,
+    "teiCoordinates": True,  # by default get the tei coordinates
+    "segmentSentences": True,  # by default do sentence segmentation
     "max_workers": 2,
 }
 
@@ -44,6 +46,8 @@ class GrobidClient(ApiClient):
         self.consolidate_citations = self.config["consolidate_citations"]
         self.include_raw_citations = self.config["include_raw_citations"]
         self.include_raw_affiliations = self.config["include_raw_affiliations"]
+        self.teiCoordinates = self.config["teiCoordinates"]
+        self.segmentSentences = self.config["segmentSentences"]
         self.max_workers = self.config["max_workers"]
         self.grobid_server = self.config["grobid_server"]
         self.grobid_port = self.config["grobid_port"]
@@ -111,12 +115,19 @@ class GrobidClient(ApiClient):
         else:
             the_data['includeRawCitations'] = '0'
 
+        if self.teiCoordinates:
+            the_data['teiCoordinates'] = ['ref', 'biblStruct', 'persName', 'head', 'figure', 'formula', 's']
+
+        if self.segmentSentences:
+            the_data['segmentSentences'] = '1'
+
         res, status = self.post(
             url=the_url,
             files=files,
             data=the_data,
             headers={'Accept': 'text/plain'}
         )
+        log.info("POST  Grobid service %s. Status %s", service, status)
 
         if status == 503:
             time.sleep(self.sleep_time)
@@ -230,6 +241,33 @@ class GrobidClient(ApiClient):
             with open(log_file, "a+") as failed:
                 failed.write("-- AFFILIATION --\n")
                 failed.write(aff_string + "\n\n")
+        else:
+            return res.text
+
+
+    def pdf_reference_annotations(self) -> str:
+        """
+        Return JSON annotations with coordinates in the PDF to be processed
+        """
+
+        the_url = 'http://' + self.grobid_server
+        the_url += ":" + self.grobid_port
+        the_url += "/api/referenceAnnotations"
+
+        res, status = self.post(
+            url=the_url,
+            headers={'Accept': 'text/plain'}
+        )
+        log.info("POST service referenceAnnotations status", status)
+
+        if status == 503:
+            time.sleep(self.sleep_time)
+            return self.pdf_reference_annotations()
+        elif status != 200:
+            with open("failed.log", "a+") as failed:
+                failed.write("Grobid reference annotation request failed" + "\n")
+            log.error('Grobid reference annotation failed with error %s', str(status))
+            return ""
         else:
             return res.text
 
