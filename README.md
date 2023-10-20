@@ -1,7 +1,7 @@
 # Convert scientific papers to TEXT and JSON
 
 This Clowder extractor converts pdf documents to text and json.
-It uses Grobid 0.6.2 
+It uses GROBID 0.6.2 to convert pdf to xml and then uses s2orc-doc2json to convert xml to json. The doc2txt/json2txt is used to convert json to text.
 
 This project is a part of [S2ORC](https://github.com/allenai/s2orc). For S2ORC, we convert PDFs to JSON using Grobid and a custom TEI.XML to JSON parser. That TEI.XML to JSON parser (`grobid2json`) is made available here. We additionally process LaTeX dumps from arXiv. That parser (`tex2json`) is also made available here.
 
@@ -9,6 +9,8 @@ The S2ORC github page includes a JSON schema, but it may be easier to understand
 
 This custom JSON schema is also used for the [CORD-19](https://github.com/allenai/cord19) project, so those who have interacted with CORD-19 may find this format familiar.
 
+For more info on Clowder extractors, read this [documentation](https://clowder-framework.readthedocs.io/en/latest/develop/extractors.html).
+For more info on GROBID read this [documentation](https://grobid.readthedocs.io/en/latest/Introduction/#:~:text=GROBID%20is%20a%20machine%20learning,made%20available%20in%20open%20source.).
 
 ## Setup your environment
 
@@ -57,7 +59,7 @@ The expected port for the Grobid service is 8070, but you can change this as wel
 There are a couple of test PDFs in `tests/input/` if you'd like to try with that.
 
 1. Using docker :
-- Run docker build :  ` docker build . -t textextractor:0.1`. Then `docker run textextractor:0.1`.
+- Run docker build :  ` docker build . -t extractors-pdf2text:0.1`. Then `docker run extractors-pdf2text:0.1`.
 - Using docker-compose : `docker-compose up`
 
 2. Using python console :
@@ -70,3 +72,20 @@ This will generate a JSON file in the specified `output_dir`. If unspecified, th
 
 For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
 
+### Citation
+If you use this utility in your research, please cite:
+
+```bibtex
+@inproceedings{lo-wang-2020-s2orc,
+    title = "{S}2{ORC}: The Semantic Scholar Open Research Corpus",
+    author = "Lo, Kyle  and Wang, Lucy Lu  and Neumann, Mark  and Kinney, Rodney  and Weld, Daniel",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.447",
+    doi = "10.18653/v1/2020.acl-main.447",
+    pages = "4969--4983"
+}
+```
