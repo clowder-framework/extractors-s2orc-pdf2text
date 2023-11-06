@@ -14,11 +14,10 @@
   ],
   "process": {
     "file": [
-      "application/pdf"
+      "manual-submission"
     ]
   },
   "external_services": [],
   "dependencies": [],
-  "bibtex": [],
-  "labels": ["Type/PDF"]
+  "bibtex": []
 }
