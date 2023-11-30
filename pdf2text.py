@@ -4,6 +4,7 @@
 import time
 import logging
 import os
+from datetime import datetime
 
 from doc2txt.grobid2json.process_pdf import process_pdf_file
 
@@ -45,8 +46,7 @@ class Pdf2TextExtractor(Extractor):
         input_filename = os.path.splitext(os.path.basename(resource["name"]))[0]
 
         temp_dir = BASE_TEMP_DIR
-        output_dir= BASE_OUTPUT_DIR
-
+        output_dir = BASE_OUTPUT_DIR
 
         # These process messages will appear in the Clowder UI under Extractions.
         connector.message_process(resource, "Loading contents of file...")
@@ -70,10 +70,25 @@ class Pdf2TextExtractor(Extractor):
         connector.message_process(resource, "Check for duplicate files...")
 
         # upload to clowder
-        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_json_file)
-        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
-        pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_txt_file)
         connector.message_process(resource, "Uploading output files to Clowder...")
+        json_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_json_file)
+        xml_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
+        txt_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_txt_file)
+        # upload metadata to dataset
+        extracted_files = [
+            {"file_id": input_file_id, "filename": input_filename, "description": "Input pdf file"},
+            {"file_id": xml_fileid, "filename": output_xml_file, "description": "TEI XML output file from Grobid"},
+            {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
+            {"file_id": txt_fileid, "filename": output_txt_file, "description": "Text output file with extracted text and section headers"}
+        ]
+        content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files}
+        context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
+        created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
+        user_id = "http://clowder.ncsa.illinois.edu/api/users"  # TODO: can update user id in config
+        agent = {"@type": "user", "user_id": user_id}
+        metadata = {"@context": [context], "created_at": created_at, "agent": agent, "content": [content]}
+        pyclowder.datasets.upload_metadata(connector, host, secret_key, dataset_id, metadata)
+
 
 
 if __name__ == "__main__":
