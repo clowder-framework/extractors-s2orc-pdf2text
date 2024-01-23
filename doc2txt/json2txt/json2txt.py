@@ -82,6 +82,13 @@ def extract_text_and_section(data):
         texts (list): List of text data extracted from json
         sections (list): List of section data extracted from json
     """
+    # Remove character spans from 'text' field
+    for item in data:
+        spans = item['cite_spans'] + item['ref_spans']
+        spans.sort(key=lambda x: x['start'], reverse=True)  # Sort in reverse order to avoid messing up the indices
+        for span in spans:
+            item['text'] = item['text'][:span['start']] + item['text'][span['end']:]
+
     texts = [item["text"] for item in data]
     sections = [item["section"] for item in data]
     return texts, sections
