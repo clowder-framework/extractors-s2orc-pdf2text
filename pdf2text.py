@@ -58,7 +58,7 @@ class Pdf2TextExtractor(Extractor):
         log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_txt_file)
 
         runtime = round(time.time() - start_time, 3)
-        log.info("runtime: %s seconds " % runtime)
+        log.info("Runtime: %s seconds " % runtime)
         connector.message_process(resource, "Pdf to text conversion finished.")
 
         # clean existing duplicate
