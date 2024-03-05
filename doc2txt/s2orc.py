@@ -322,7 +322,12 @@ class Paragraph:
     An example json representation (values are examples, not accurate):
 
     {
-        "text": "Formal language techniques BID1 may be used to study FORMULA0 (see REF0)...",
+        "text": [
+            {
+            "sentence": "Formal language techniques BID1 may be used to study FORMULA0 (see REF0)...",
+            "coords": "1,71.66,508.86,218.61,13.15;1,72.00,522.41,162.19,13.15",
+            },
+        ],
         "mention_spans": [
             {
                 "start": 27,
