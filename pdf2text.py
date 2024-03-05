@@ -79,7 +79,7 @@ class Pdf2TextExtractor(Extractor):
             {"file_id": input_file_id, "filename": input_filename, "description": "Input pdf file"},
             {"file_id": xml_fileid, "filename": output_xml_file, "description": "TEI XML output file from Grobid"},
             {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
-            {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text,section, and coordinates"}
+            {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
         ]
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
