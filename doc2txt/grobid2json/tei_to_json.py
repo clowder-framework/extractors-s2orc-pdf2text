@@ -5,7 +5,6 @@ import sys
 import bs4
 import re
 from bs4 import BeautifulSoup, NavigableString
-import xml.etree.ElementTree as ET
 from typing import List, Dict, Tuple
 
 from doc2txt.s2orc import Paper
