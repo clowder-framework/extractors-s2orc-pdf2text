@@ -53,9 +53,9 @@ class Pdf2TextExtractor(Extractor):
 
         # process pdf file
         start_time = time.time()
-        output_xml_file, output_json_file, output_txt_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
+        output_xml_file, output_json_file, output_csv_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
 
-        log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_txt_file)
+        log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_csv_file)
 
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
@@ -73,13 +73,13 @@ class Pdf2TextExtractor(Extractor):
         connector.message_process(resource, "Uploading output files to Clowder...")
         json_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_json_file)
         xml_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
-        txt_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_txt_file)
+        csv_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_csv_file)
         # upload metadata to dataset
         extracted_files = [
             {"file_id": input_file_id, "filename": input_filename, "description": "Input pdf file"},
             {"file_id": xml_fileid, "filename": output_xml_file, "description": "TEI XML output file from Grobid"},
             {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
-            {"file_id": txt_fileid, "filename": output_txt_file, "description": "Text output file with extracted text and section headers"}
+            {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text,section, and coordinates"}
         ]
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
