@@ -1,14 +1,8 @@
 # Tokenize sentences using BERT tokenizer
 
-import json
-import logging
 from transformers import BertConfig, BertTokenizer
 from doc2txt.utils.bert_config import Config
 
-import pandas as pd
-
-# create log object with current module name
-log = logging.getLogger(__name__)
 
 def tokenize_sentence(sentence):
     config = Config()
