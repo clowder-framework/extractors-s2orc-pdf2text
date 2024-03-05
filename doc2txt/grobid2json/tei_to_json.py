@@ -5,6 +5,7 @@ import sys
 import bs4
 import re
 from bs4 import BeautifulSoup, NavigableString
+import xml.etree.ElementTree as ET
 from typing import List, Dict, Tuple
 
 from doc2txt.s2orc import Paper
@@ -420,17 +421,31 @@ def process_paragraph(
     :param bib_dict:
     :param ref_dict:
     :param bracket: if bracket style, expand and clean up citations
-    :return:
+    :return: {text: [ {sentence :str, coords: str} ], cite_spans: List, ref_spans: List, eq_spans: List, section: List}
     """
+    sentence_texts = []
     # return empty paragraph if no text
     if not para_el.text:
         return {
-            'text': "",
+            'text': sentence_texts,
             'cite_spans': [],
             'ref_spans': [],
             'eq_spans': [],
             'section': section_names
         }
+    # Find all <s> tags within <p>
+    s_tags = para_el.find_all('s')
+    # Iterate through <s> tags and extract "coords" attribute and text
+    for s_tag in s_tags:
+        text = s_tag.text
+        # substitute space characters
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'\s', ' ', text)
+        coords = s_tag.get('coords')
+        sentence_texts.append({
+            'sentence': text,
+            'coords': coords
+        })
 
     # replace formulas with formula text
     process_formulas_in_paragraph(para_el, sp)
@@ -490,7 +505,7 @@ def process_paragraph(
         assert para_text[ref_blob["start"]:ref_blob["end"]] == ref_blob["text"]
 
     return {
-        'text': para_text,
+        'text': sentence_texts,
         'cite_spans': cite_span_blobs,
         'ref_spans': ref_span_blobs,
         'eq_spans': [],
