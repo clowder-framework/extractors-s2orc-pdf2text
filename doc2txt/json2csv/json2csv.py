@@ -30,7 +30,7 @@ def process_json2csv(input_filename, json_input_file):
     body_data = pdf_json_data["body_text"]
 
     # convert to dataframe
-    tokenized_title = tokenize_sentence(title_text)
+    tokenized_title = [tokenize_sentence(title_text)]
     title_df = pd.DataFrame({'file': input_filename, 'section': 'title', 'sentence': title_text,
                              'prev_sentence': '', 'next_sentence': '',
                              'tokenized_sentence': tokenized_title, 'coordinates': ''})
@@ -65,7 +65,7 @@ def extract_sentences(input_file, data):
             tokenized_sentence = tokenize_sentence(s['sentence'])
             new_row = {'file': input_file, 'section': para['section'], 'sentence': s['sentence'],
                             'prev_sentence': '', 'next_sentence': '',
-                            'tokenized_sentence': tokenized_sentence[0], 'coordinates': s['coords']}
+                            'tokenized_sentence': tokenized_sentence, 'coordinates': s['coords']}
             list_df.append(new_row)
     df = pd.DataFrame(list_df)
 

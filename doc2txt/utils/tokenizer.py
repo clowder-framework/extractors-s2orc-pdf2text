@@ -3,9 +3,9 @@
 from transformers import BertConfig, BertTokenizer
 from doc2txt.utils.bert_config import Config
 
+config = Config()
 
 def tokenize_sentence(sentence):
-    config = Config()
     tokenizer = BertTokenizer.from_pretrained(config.bert_model_name, do_lower_case=True)
     text_ids = tokenizer.encode(sentence,
                                 add_special_tokens=True,
