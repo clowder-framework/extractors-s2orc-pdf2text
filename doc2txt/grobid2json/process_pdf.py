@@ -8,7 +8,7 @@ from typing import Optional, Dict
 
 from doc2txt.grobid2json.grobid.grobid_client import GrobidClient
 from doc2txt.grobid2json.tei_to_json import convert_tei_xml_file_to_s2orc_json, convert_tei_xml_soup_to_s2orc_json
-from doc2txt.json2txt.json2txt import process_json
+from doc2txt.json2csv.json2csv import process_json2csv
 
 BASE_TEMP_DIR = 'temp'
 BASE_OUTPUT_DIR = 'output'
@@ -51,7 +51,7 @@ def process_pdf_file(
     :param input_filename: input filename resource
     :param temp_dir:
     :param output_dir:
-    :return: xml output file, json output file, txt output file
+    :return: xml output file, json output file, csv output file
     """
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
@@ -59,7 +59,7 @@ def process_pdf_file(
     # filenames for tei and json outputs
     tei_file = os.path.join(temp_dir, f'{input_filename}.tei.xml')
     json_file = os.path.join(output_dir, f'{input_filename}.json')
-    txt_file = os.path.join(output_dir, f'{input_filename}.txt')
+    csv_file = os.path.join(output_dir, f'{input_filename}.csv')
 
     # check if input file exists and output file doesn't
     if not os.path.exists(input_file):
@@ -82,12 +82,10 @@ def process_pdf_file(
         json.dump(paper.release_json(), outf, indent=4, sort_keys=False)
 
     # extract fields from json and write to file
-    output_txt = process_json(json_file)
-    with open(txt_file, 'w') as outfile:
-        for text in output_txt:
-            outfile.write(f"{text}\n")
+    output_df = process_json2csv(input_filename, json_file)
+    output_df.to_csv(csv_file, index=False)
 
-    return tei_file, json_file, txt_file
+    return tei_file, json_file, csv_file
 
 
 if __name__ == '__main__':
@@ -110,7 +108,7 @@ if __name__ == '__main__':
     os.makedirs(output_path, exist_ok=True)
 
     input_filename = os.path.splitext(os.path.basename(input_path))[0]
-    tei_file, json_file, txt_file = process_pdf_file(input_path, input_filename, temp_path, output_path)
+    tei_file, json_file, csv_file = process_pdf_file(input_path, input_filename, temp_path, output_path)
 
     runtime = round(time.time() - start_time, 3)
     print("runtime: %s seconds " % (runtime))

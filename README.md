@@ -89,3 +89,21 @@ If you use this utility in your research, please cite:
     pages = "4969--4983"
 }
 ```
+
+# Use as a Clowder Extractor
+
+Clowder extractor for converting pdf documents to xml, json and csv format.
+
+## Build extractor image
+
+- Run `docker build . -t hub.ncsa.illinois.edu/clowder/extractors-pdf2text:<version>` to build docker image
+- If you ran into error `[Errno 28] No space left on device:`, try below:
+    - Free more spaces by running `docker system prune --all` 
+    - Increase the Disk image size. You can find the configuration in Docker Desktop
+
+## Publish Image to Private NCSA repo
+- Login first: `docker login hub.ncsa.illinois.edu`
+- Run `docker image push hub.ncsa.illinois.edu/clowder/extractors-pdf2text:<version>`
+
+## Deployment
+- Please refer to Clowder instructions

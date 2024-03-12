@@ -37,4 +37,5 @@ hs_err_pid*
 # Test folder
 **/tests
 **/output
+**/output_dir/
 grobid-0.6.1/

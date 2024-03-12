@@ -322,7 +322,12 @@ class Paragraph:
     An example json representation (values are examples, not accurate):
 
     {
-        "text": "Formal language techniques BID1 may be used to study FORMULA0 (see REF0)...",
+        "text": [
+            {
+            "sentence": "Formal language techniques BID1 may be used to study FORMULA0 (see REF0)...",
+            "coords": "1,71.66,508.86,218.61,13.15;1,72.00,522.41,162.19,13.15",
+            },
+        ],
         "mention_spans": [
             {
                 "start": 27,
@@ -436,7 +441,13 @@ class Paper:
         Get all the body text joined by a newline
         :return:
         """
-        return '\n'.join([para.text for para in self.abstract])
+        # [ {text: [ {sentence :str, coords: str} ], cite_spans: List, ref_spans: List, eq_spans: List, section: List}]
+        abstract_text = ''
+        sentences = ''
+        for para in self.abstract:
+            sentences = ' '.join([sent['sentence'] for sent in para.text])
+        abstract_text += sentences + '\n'
+        return abstract_text
 
     @property
     def raw_body_text(self) -> str:
@@ -444,7 +455,12 @@ class Paper:
         Get all the body text joined by a newline
         :return:
         """
-        return '\n'.join([para.text for para in self.body_text])
+        body_text = ''
+        sentences = ''
+        for para in self.body_text:
+            sentences = ' '.join([sent['sentence'] for sent in para.text])
+        body_text += sentences + '\n'
+        return body_text
 
     def release_json(self, doc_type: str="pdf"):
         """
