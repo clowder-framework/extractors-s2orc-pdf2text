@@ -89,6 +89,14 @@ class Pdf2TextExtractor(Extractor):
         metadata = {"@context": [context], "created_at": created_at, "agent": agent, "content": [content]}
         pyclowder.datasets.upload_metadata(connector, host, secret_key, dataset_id, metadata)
 
+        # clean up temp_dir and output_dir
+        temp_filelist = [f for f in os.listdir(temp_dir)]
+        for f in temp_filelist:
+            os.remove(os.path.join(temp_dir, f))
+
+        out_filelist = [f for f in os.listdir(output_dir)]
+        for f in out_filelist:
+            os.remove(os.path.join(output_dir, f))
 
 
 if __name__ == "__main__":
