@@ -245,7 +245,7 @@ class GrobidClient(ApiClient):
             return res.text
 
 
-    def pdf_reference_annotations(self) -> str:
+    def pdf_reference_annotations(self, pdf_file: str) -> str:
         """
         Return JSON annotations with coordinates in the PDF to be processed
         """
@@ -253,6 +253,52 @@ class GrobidClient(ApiClient):
         the_url = 'http://' + self.grobid_server
         the_url += ":" + self.grobid_port
         the_url += "/api/referenceAnnotations"
+
+        log.info("Processing pdf reference annotations for file in path %s with name %s", pdf_file)
+        pdf_strm = open(pdf_file, 'rb').read()
+
+        # process the stream
+        files = {
+            'input': (
+                pdf_file,
+                pdf_strm,
+                'application/pdf',
+                {'Expires': '0'}
+            )
+        }
+
+        # set the GROBID parameters
+        the_data = {}
+        if self.generate_ids:
+            the_data['generateIDs'] = '1'
+        else:
+            the_data['generateIDs'] = '0'
+
+        if self.consolidate_header:
+            the_data['consolidateHeader'] = '1'
+        else:
+            the_data['consolidateHeader'] = '0'
+
+        if self.consolidate_citations:
+            the_data['consolidateCitations'] = '1'
+        else:
+            the_data['consolidateCitations'] = '0'
+
+        if self.include_raw_affiliations:
+            the_data['includeRawAffiliations'] = '1'
+        else:
+            the_data['includeRawAffiliations'] = '0'
+
+        if self.include_raw_citations:
+            the_data['includeRawCitations'] = '1'
+        else:
+            the_data['includeRawCitations'] = '0'
+
+        if self.teiCoordinates:
+            the_data['teiCoordinates'] = ['ref', 'biblStruct', 'persName', 'head', 'figure', 'formula', 's']
+
+        if self.segmentSentences:
+            the_data['segmentSentences'] = '1'
 
         res, status = self.post(
             url=the_url,
