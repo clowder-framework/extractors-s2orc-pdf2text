@@ -60,4 +60,4 @@ def extract_sentences(input_file, data):
             list_df.append(new_row)
     df = pd.DataFrame(list_df)
 
-    return df if len(list_df) > 0 else pd.DataFrame(columns=['file', 'section', 'sentence', 'prev_sentence', 'next_sentence', 'tokenized_sentence', 'coordinates'])
+    return df if len(list_df) > 0 else pd.DataFrame(columns=['file', 'section', 'sentence', 'coordinates'])
