@@ -4,7 +4,6 @@ import json
 import logging
 
 import pandas as pd
-from doc2txt.utils.tokenizer import tokenize_sentence
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -30,20 +29,14 @@ def process_json2csv(input_filename, json_input_file):
     body_data = pdf_json_data["body_text"]
 
     # convert to dataframe
-    tokenized_title = [tokenize_sentence(title_text)]
-    title_df = pd.DataFrame({'file': input_filename, 'section': 'title', 'sentence': title_text,
-                             'prev_sentence': '', 'next_sentence': '',
-                             'tokenized_sentence': tokenized_title, 'coordinates': ''})
+    title_data = [input_filename, 'title', title_text, '']
+    title_df = pd.DataFrame([title_data], columns=['file', 'section', 'sentence', 'coordinates'])
     # Get the text and section from the body
     abstract_df = extract_sentences(input_filename, abstract_data)
     body_df = extract_sentences(input_filename, body_data)
 
     frames = [title_df, abstract_df, body_df]
     df = pd.concat(frames)
-    # Get the previous sentence
-    df['prev_sentence'] = df['sentence'].shift(1)
-    # Get the next sentence
-    df['next_sentence'] = df['sentence'].shift(-1)
 
     json_file.close()
 
@@ -62,10 +55,8 @@ def extract_sentences(input_file, data):
     list_df = []
     for para in data:
         for i, s in enumerate(para['text']):
-            tokenized_sentence = tokenize_sentence(s['sentence'])
-            new_row = {'file': input_file, 'section': para['section'], 'sentence': s['sentence'],
-                            'prev_sentence': '', 'next_sentence': '',
-                            'tokenized_sentence': tokenized_sentence, 'coordinates': s['coords']}
+            new_row = {'file': input_file, 'section': para['section'],
+                       'sentence': s['sentence'], 'coordinates': s['coords']}
             list_df.append(new_row)
     df = pd.DataFrame(list_df)
 

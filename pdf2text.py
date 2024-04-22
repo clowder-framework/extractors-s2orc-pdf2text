@@ -83,10 +83,10 @@ class Pdf2TextExtractor(Extractor):
         ]
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
-        created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
+        #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
         user_id = "http://clowder.ncsa.illinois.edu/api/users"  # TODO: can update user id in config
         agent = {"@type": "user", "user_id": user_id}
-        metadata = {"@context": [context], "created_at": created_at, "agent": agent, "content": [content]}
+        metadata = {"@context": [context], "agent": agent, "content": content}
         pyclowder.datasets.upload_metadata(connector, host, secret_key, dataset_id, metadata)
 
         # clean up temp_dir and output_dir
