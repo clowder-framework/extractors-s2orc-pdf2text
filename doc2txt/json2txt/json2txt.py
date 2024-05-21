@@ -7,7 +7,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def process_json(input_file):
+def process_json2txt(input_file):
     """
     Method to convert json file to text.
     Extracts data from specific json fields and return a list of strings as text
