@@ -29,7 +29,7 @@ def process_json2csv(input_filename, json_input_file):
     body_data = pdf_json_data["body_text"]
 
     # convert to dataframe
-    title_data = [input_filename, 'title', title_text, '']
+    title_data = [input_filename, 'title', title_text, '1']
     title_df = pd.DataFrame([title_data], columns=['file', 'section', 'sentence', 'coordinates'])
     # Get the text and section from the body
     abstract_df = extract_sentences(input_filename, abstract_data)
