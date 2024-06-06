@@ -17,4 +17,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Output json filename changed to same name as input file. [#6](https://github.com/clowder-framework/text-extractor/issues/6)
-
+- Added `back_matter` field to json output. [#23](https://github.com/clowder-framework/extractors-s2orc-pdf2text/issues/23)
+- Added page coordinates for title. [#24](https://github.com/clowder-framework/extractors-s2orc-pdf2text/issues/24)
