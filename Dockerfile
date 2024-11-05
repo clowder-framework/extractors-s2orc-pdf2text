@@ -9,9 +9,6 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 COPY pdf2text.py ./
 
-WORKDIR ./
-ENV PYTHONPATH=./
-
 EXPOSE 8070
 
 CMD ["python3","pdf2text.py", "--heartbeat", "40"]
