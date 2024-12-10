@@ -83,7 +83,7 @@ def process_pdf_file(
 
     # extract fields from json and write to file
     output_df = process_json2csv(input_filename, json_file)
-    output_df.to_csv(csv_file, index=False)
+    output_df.to_csv(csv_file, index=False, encoding='utf-8')
 
     return tei_file, json_file, csv_file
 
