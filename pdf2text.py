@@ -97,7 +97,7 @@ class Pdf2TextExtractor(Extractor):
             {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
             {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
         ]
-        page_dimensions = {"page_width": page_width, "page_height": page_height}
+        page_dimensions = {"width": page_width, "height": page_height}
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
         #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
