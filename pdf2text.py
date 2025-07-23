@@ -5,6 +5,7 @@ import time
 import logging
 import os
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 from doc2txt.grobid2json.process_pdf import process_pdf_file
 
@@ -56,10 +57,25 @@ class Pdf2TextExtractor(Extractor):
         output_xml_file, output_json_file, output_csv_file = process_pdf_file(input_file, input_filename, temp_dir, output_dir)
 
         log.info("Output files generated : %s, %s, %s", output_xml_file, output_json_file, output_csv_file)
-
         runtime = round(time.time() - start_time, 3)
         log.info("runtime: %s seconds " % runtime)
-        connector.message_process(resource, "Pdf to text conversion finished.")
+        connector.message_process(resource, "Pdf to text conversion finished.")     
+
+        xml_surface_tags = []
+        page_width = 600  # default page width and height
+        page_height = 800
+        # get page height and width from xml file
+        if output_xml_file:
+            with open(output_xml_file) as f:
+                xml = f.read()
+                soup = BeautifulSoup(xml, 'xml')
+                xml_surface_tags = soup.find_all('surface')
+            pass
+
+        if len(xml_surface_tags) > 0:
+            log.info("Extracting pdf dimensions from xml file")
+            page_width = xml_surface_tags[0]['lrx']
+            page_height = xml_surface_tags[0]['lry']
 
         # clean existing duplicate
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
@@ -81,7 +97,8 @@ class Pdf2TextExtractor(Extractor):
             {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
             {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
         ]
-        content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files}
+        page_dimensions = {"width": page_width, "height": page_height}
+        content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
         #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
         user_id = "http://clowder.ncsa.illinois.edu/api/users"  # TODO: can update user id in config

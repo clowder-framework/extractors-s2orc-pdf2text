@@ -1,7 +1,7 @@
 {
   "@context": "http://clowder.ncsa.illinois.edu/contexts/extractors.jsonld",
   "name": "pdf2text-extractor",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Extracts text from pdf files. Creates an xml, json and csv file and uploads to Clowder dataset. Uses Grobid service and AllenAI s2orc-doc2json",
   "author": "Mathew, Minu <minum@illinois.edu>; Lo, Kyle  and Wang, Lucy Lu  and Neumann, Mark  and Kinney, Rodney  and Weld, Daniel",
   "contributors": [],
