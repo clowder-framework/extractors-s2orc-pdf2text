@@ -15,11 +15,13 @@ For more info on GROBID read this [documentation](https://grobid.readthedocs.io/
 ## Run pdf2text-extractor in local
 Run grobid/grobid:0.6.2 docker image from docker desktop.
 
-```(rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
-/Users/minum/Documents/NCSA/Clowder/Clowder_Github/extractors-s2orc-pdf2text```
+```
+(rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
+/Users/minum/Documents/NCSA/Clowder/Clowder_Github/extractors-s2orc-pdf2text
+```
 
-in doc2txt/grobid2json/grobid/grobid_client.py : change "grobid_server": "0.0.0.0",
-python -m doc2txt.grobid2json.process_pdf -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
+in `doc2txt/grobid2json/grobid/grobid_client.py` : change "grobid_server": "0.0.0.0",
+`python -m doc2txt.grobid2json.process_pdf -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/`
 
 ### Process a PDF
 
