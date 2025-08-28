@@ -12,6 +12,38 @@ This custom JSON schema is also used for the [CORD-19](https://github.com/allena
 For more info on Clowder extractors, read this [documentation](https://clowder-framework.readthedocs.io/en/latest/develop/extractors.html).
 For more info on GROBID read this [documentation](https://grobid.readthedocs.io/en/latest/Introduction/#:~:text=GROBID%20is%20a%20machine%20learning,made%20available%20in%20open%20source.).
 
+## Run pdf2text-extractor in local
+Run grobid/grobid:0.6.2 docker image from docker desktop.
+
+```(rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
+/Users/minum/Documents/NCSA/Clowder/Clowder_Github/extractors-s2orc-pdf2text```
+
+in doc2txt/grobid2json/grobid/grobid_client.py : change "grobid_server": "0.0.0.0",
+python -m doc2txt.grobid2json.process_pdf -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
+
+### Process a PDF
+
+There are a couple of test PDFs in `tests/input/` if you'd like to try with that.
+
+1. Using docker :
+- Run docker build :  ` docker build . -t extractors-pdf2text:0.1`. Then `docker run extractors-pdf2text:0.1`.
+- Using docker-compose : `docker-compose up`
+
+2. Using python console :
+
+```console
+python doc2json/grobid2json/process_pdf.py -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
+```
+
+This will generate a JSON file in the specified `output_dir`. If unspecified, the file will be in the `output/` directory from your path.
+
+- The extractor will generate a `tei.xml`, `json` and `csv` file.
+- The main process is `process_pdf_file()` method.
+- Grobid is used to generate the `tei.xml` file which has all the details. The process is `client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")`
+- S2ORC package convets the `tei.xml` file to `json` . The process is `paper = convert_tei_xml_file_to_s2orc_json(tei_file)`
+- We convert the json file to csv file in the format required for RCT model inference. The process is `output_df = process_json2csv(input_filename, json_file)`
+
+
 ## Setup your environment
 
 NOTE: Conda is shown but any other python env manager should be fine
@@ -57,36 +89,6 @@ The expected port for the Grobid service is 8070, but you can change this as wel
 For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
 
 
-### Process a PDF
-
-There are a couple of test PDFs in `tests/input/` if you'd like to try with that.
-
-1. Using docker :
-- Run docker build :  ` docker build . -t extractors-pdf2text:0.1`. Then `docker run extractors-pdf2text:0.1`.
-- Using docker-compose : `docker-compose up`
-
-2. Using python console :
-
-```console
-python doc2json/grobid2json/process_pdf.py -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
-```
-
-This will generate a JSON file in the specified `output_dir`. If unspecified, the file will be in the `output/` directory from your path.
-
-- The extractor will generate a `tei.xml`, `json` and `csv` file.
-- The main process is `process_pdf_file()` method.
-- Grobid is used to generate the `tei.xml` file which has all the details. The process is `client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")`
-- S2ORC package convets the `tei.xml` file to `json` . The process is `paper = convert_tei_xml_file_to_s2orc_json(tei_file)`
-- We convert the json file to csv file in the format required for RCT model inference. The process is `output_df = process_json2csv(input_filename, json_file)`
-
-### Run pdf2text-extractor in local
-Run grobid/grobid:0.6.2 docker image from docker desktop.
-
-```(rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
-/Users/minum/Documents/NCSA/Clowder/Clowder_Github/extractors-s2orc-pdf2text```
-
-in doc2txt/grobid2json/grobid/grobid_client.py : change "grobid_server": "0.0.0.0",
-python -m doc2txt.grobid2json.process_pdf -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
 
 
 ### Citation
