@@ -54,6 +54,9 @@ This will setup, install and run Grobid, currently hard-coded as version 0.6.1. 
 
 The expected port for the Grobid service is 8070, but you can change this as well. Make sure to edit the port in both the Grobid config file as well as `grobid/grobid_client.py` and `docker-compose.yml`.
 
+For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
+
+
 ### Process a PDF
 
 There are a couple of test PDFs in `tests/input/` if you'd like to try with that.
@@ -76,7 +79,15 @@ This will generate a JSON file in the specified `output_dir`. If unspecified, th
 - S2ORC package convets the `tei.xml` file to `json` . The process is `paper = convert_tei_xml_file_to_s2orc_json(tei_file)`
 - We convert the json file to csv file in the format required for RCT model inference. The process is `output_df = process_json2csv(input_filename, json_file)`
 
-For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
+### Run pdf2text-extractor in local
+Run grobid/grobid:0.6.2 docker image from docker desktop.
+
+```(rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
+/Users/minum/Documents/NCSA/Clowder/Clowder_Github/extractors-s2orc-pdf2text```
+
+in doc2txt/grobid2json/grobid/grobid_client.py : change "grobid_server": "0.0.0.0",
+python -m doc2txt.grobid2json.process_pdf -i tests/pdf/N18-3011.pdf -t temp_dir/ -o output_dir/
+
 
 ### Citation
 If you use this utility in your research, please cite:
