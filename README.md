@@ -70,6 +70,12 @@ python doc2json/grobid2json/process_pdf.py -i tests/pdf/N18-3011.pdf -t temp_dir
 
 This will generate a JSON file in the specified `output_dir`. If unspecified, the file will be in the `output/` directory from your path.
 
+- The extractor will generate a `tei.xml`, `json` and `csv` file.
+- The main process is `process_pdf_file()` method.
+- Grobid is used to generate the `tei.xml` file which has all the details. The process is `client.process_pdf(input_file, input_filename, temp_dir, "processFulltextDocument")`
+- S2ORC package convets the `tei.xml` file to `json` . The process is `paper = convert_tei_xml_file_to_s2orc_json(tei_file)`
+- We convert the json file to csv file in the format required for RCT model inference. The process is `output_df = process_json2csv(input_filename, json_file)`
+
 For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
 
 ### Citation
