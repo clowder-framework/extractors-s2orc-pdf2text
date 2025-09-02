@@ -1,7 +1,7 @@
 # Convert scientific papers to TEXT and JSON
 
 This Clowder extractor converts pdf documents to text and json.
-It uses GROBID 0.6.2 to convert pdf to xml and then uses s2orc-doc2json to convert xml to json. The doc2txt/json2txt is used to convert json to text.
+It uses GROBID 0.8.0 to convert pdf to xml and then uses s2orc-doc2json to convert xml to json. The doc2txt/json2txt is used to convert json to text.
 
 This project is a part of [S2ORC](https://github.com/allenai/s2orc). For S2ORC, we convert PDFs to JSON using Grobid and a custom TEI.XML to JSON parser. That TEI.XML to JSON parser (`grobid2json`) is made available here. We additionally process LaTeX dumps from arXiv. That parser (`tex2json`) is also made available here.
 
@@ -12,8 +12,10 @@ This custom JSON schema is also used for the [CORD-19](https://github.com/allena
 For more info on Clowder extractors, read this [documentation](https://clowder-framework.readthedocs.io/en/latest/develop/extractors.html).
 For more info on GROBID read this [documentation](https://grobid.readthedocs.io/en/latest/Introduction/#:~:text=GROBID%20is%20a%20machine%20learning,made%20available%20in%20open%20source.).
 
-## Run pdf2text-extractor in local
-Run grobid/grobid:0.6.2 docker image from docker desktop.
+## Run pdf2text-extractor in local using python
+Run grobid/grobid:0.8.0 docker image from docker desktop.
+
+**Caveat:** grobid:0.8.0 is not supported by Mac M1 chip. If using Mac silicon, switch to grobid:0.6.2
 
 ```
 (rctenv) NCSA-P10E69253:extractors-s2orc-pdf2text minum$ pwd
@@ -69,11 +71,19 @@ The current `grobid2json` tool uses Grobid to first process each PDF into XML, t
 
 You will need to have Java installed on your machine. Then, you can install your own version of Grobid and get it running.
 
-1. Using docker : 
+1. Using docker (recommended) : 
+1.1 With grobid:0.6.2 -
 ```
 docker pull grobid/grobid:0.6.2
 
 docker run -p 8070:8070 grobid/grobid:0.6.2
+```
+
+1.2 With grobid:0.8.0 - 
+```
+docker pull grobid/grobid:0.8.0
+
+docker run -p 8070:8070 grobid/grobid:0.8.0
 ```
 
 2. OR Using script:
@@ -90,7 +100,7 @@ The expected port for the Grobid service is 8070, but you can change this as wel
 
 For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
 
-
+On a successful `docker run` command, grobid service will get started and in terminal you should be able to see [these logs are per this screenshot](./grobid-docker-run.png)
 
 
 ### Citation

@@ -54,11 +54,27 @@ def extract_sentences(input_file, data):
         df: pandas dataframe of sentences and related info.
     """
     # [ {text: [ {sentence :str, coords: str} ], cite_spans: List, ref_spans: List, eq_spans: List, section: str}]
+    # sometimes the data is an empty list []
+    if not data:
+        return pd.DataFrame(columns=['file', 'section', 'sentence', 'coordinates'])
     list_df = []
     for para in data:
         for i, s in enumerate(para['text']):
+            # Handle both dictionary and string formats
+            if isinstance(s, dict):
+                # Expected format: dictionary with 'sentence' and 'coords' keys
+                sentence = s.get('sentence', '')
+                coords = s.get('coords', '')
+            elif isinstance(s, str):
+                # Handle case where text is directly a string
+                sentence = s
+                coords = ''
+            else:
+                # Skip unexpected formats
+                continue
+                
             new_row = {'file': input_file, 'section': para['section'],
-                       'sentence': s['sentence'], 'coordinates': s['coords']}
+                       'sentence': sentence, 'coordinates': coords}
             list_df.append(new_row)
     df = pd.DataFrame(list_df)
 
