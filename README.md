@@ -101,7 +101,8 @@ The expected port for the Grobid service is 8070, but you can change this as wel
 
 For more information on S2ORC-DOC2JSON refer https://github.com/allenai/s2orc-doc2json
 
-
+On a successful `docker run` command, grobid service will get started and in terminal you should be able to see the below.
+![grobid docker run][./grobid-docker-run.png]
 
 
 ### Citation
