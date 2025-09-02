@@ -22,7 +22,7 @@ require something scalable too, which is not implemented for the moment.
 '''
 
 DEFAULT_GROBID_CONFIG = {
-    "grobid_server": "grobid",   # "0.0.0.0" for local  else "grobid"
+    "grobid_server": "0.0.0.0",   # "0.0.0.0" for local  else "grobid"
     #"grobid_server": "172.17.0.0",  # use the docker IP address if running clowder docker-compose in local
     "grobid_port": "8070",
     "batch_size": 1000,

@@ -55,10 +55,25 @@ def extract_sentences(input_file, data):
     """
     # [ {text: [ {sentence :str, coords: str} ], cite_spans: List, ref_spans: List, eq_spans: List, section: str}]
     list_df = []
-    for para in data:
+    for index, para in enumerate(data):
+        if index<3:
+            print(para['text'])
         for i, s in enumerate(para['text']):
+            # Handle both dictionary and string formats
+            if isinstance(s, dict):
+                # Expected format: dictionary with 'sentence' and 'coords' keys
+                sentence = s.get('sentence', '')
+                coords = s.get('coords', '')
+            elif isinstance(s, str):
+                # Handle case where text is directly a string
+                sentence = s
+                coords = ''
+            else:
+                # Skip unexpected formats
+                continue
+                
             new_row = {'file': input_file, 'section': para['section'],
-                       'sentence': s['sentence'], 'coordinates': s['coords']}
+                       'sentence': sentence, 'coordinates': coords}
             list_df.append(new_row)
     df = pd.DataFrame(list_df)
 
