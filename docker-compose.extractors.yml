@@ -10,7 +10,7 @@ services:
 
   # process pdf files
   grobid:
-    image: grobid/grobid:0.6.2
+    image: grobid/grobid:0.8.0
     ports:
       - 8070:8070
   # extractor text-extractor
