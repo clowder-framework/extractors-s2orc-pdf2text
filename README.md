@@ -85,7 +85,6 @@ docker pull grobid/grobid:0.8.0
 
 docker run -p 8070:8070 grobid/grobid:0.8.0
 ```
-The above comman
 
 2. OR Using script:
 
