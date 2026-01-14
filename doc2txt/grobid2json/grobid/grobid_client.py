@@ -116,7 +116,7 @@ class GrobidClient(ApiClient):
             the_data['includeRawCitations'] = '0'
 
         if self.teiCoordinates:
-            the_data['teiCoordinates'] = ['ref', 'biblStruct', 'persName', 'head', 'figure', 'formula', 's']
+            the_data['teiCoordinates'] = ['ref', 'biblStruct', 'persName', 'head', 'figure', 'formula', 's', 'title']
 
         if self.segmentSentences:
             the_data['segmentSentences'] = '1'

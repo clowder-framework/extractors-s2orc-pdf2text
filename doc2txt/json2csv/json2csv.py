@@ -23,14 +23,15 @@ def process_json2csv(input_filename, json_input_file):
     json_file = open(json_input_file)
     json_data = json.load(json_file)  # load json object to a dictionary
 
-    title_text = json_data["title"]
+    title_text = json_data["title"]["text"]
+    title_coords = json_data["title"]["coords"]
     pdf_json_data = json_data["pdf_parse"]
     abstract_data = pdf_json_data["abstract"]
     body_data = pdf_json_data["body_text"]
     back_matter_data = pdf_json_data["back_matter"]
 
     # convert to dataframe
-    title_data = [input_filename, 'title', title_text, '1']
+    title_data = [input_filename, 'title', title_text, title_coords]
     title_df = pd.DataFrame([title_data], columns=['file', 'section', 'sentence', 'coordinates'])
     # Get the text and section from the body
     abstract_df = extract_sentences(input_filename, abstract_data)
