@@ -381,7 +381,7 @@ def extract_paper_metadata_from_grobid_xml(tag: bs4.element.Tag) -> Dict:
     """
     clean_tags(tag)
     paper_metadata = {
-        "title": tag.titlestmt.title.text,
+        "title": {"text": tag.titlestmt.title.text, "coords": tag.titlestmt.title.get("coord", "1")},
         "authors": get_author_data_from_grobid_xml(tag),
         "year": get_publication_datetime_from_grobid_xml(tag)
     }
