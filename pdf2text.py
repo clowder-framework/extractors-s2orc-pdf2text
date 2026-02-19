@@ -73,9 +73,17 @@ class Pdf2TextExtractor(Extractor):
             pass
 
         if len(xml_surface_tags) > 0:
-            log.info("Extracting pdf dimensions from xml file")
-            page_width = xml_surface_tags[0]['lrx']
-            page_height = xml_surface_tags[0]['lry']
+            log.info("Extracting pdf page dimensions from xml file")
+            page_dimensions = {}
+            for surface in xml_surface_tags:
+                page_num = surface.get('n', str(len(page_dimensions) + 1))
+                page_dimensions[str(page_num)] = {
+                    "width": float(surface.get('lrx', page_width)),
+                    "height": float(surface.get('lry', page_height))
+                }
+        else:
+            log.error("No page dimensions found in xml file. Falling back to default dimensions.")
+            page_dimensions = {"1": {"width": page_width, "height": page_height}}
 
         # clean existing duplicate
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
@@ -97,7 +105,6 @@ class Pdf2TextExtractor(Extractor):
             {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
             {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
         ]
-        page_dimensions = {"width": page_width, "height": page_height}
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
         context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
         #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
