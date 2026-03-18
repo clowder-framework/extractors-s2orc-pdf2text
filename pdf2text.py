@@ -4,10 +4,17 @@
 import time
 import logging
 import os
+import json
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+import requests
 from doc2txt.grobid2json.process_pdf import process_pdf_file
+
+# Use api/v2 when CLOWDER_API_VERSION=v2 (Clowder2)
+# Also supports CLOWDER_VERSION=2 from clowder2 docker-compose
+CLOWDER_API_VERSION = os.environ.get('CLOWDER_API_VERSION') or ('v2' if os.environ.get('CLOWDER_VERSION') == '2' else 'v1')
+CLOWDER_API_PATH = 'api/v2' if CLOWDER_API_VERSION == 'v2' else 'api'
 
 from pyclowder.extractors import Extractor
 import pyclowder.files
@@ -78,12 +85,17 @@ class Pdf2TextExtractor(Extractor):
             page_height = xml_surface_tags[0]['lry']
 
         # clean existing duplicate
+        connector.message_process(resource, "Check for duplicate files...")
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
         for file in files_in_dataset:
-            if file["filename"] == output_json_file or file["filename"] == output_xml_file:
-                url = '%sapi/files/%s?key=%s' % (host, file["id"], secret_key)
-                connector.delete(url, verify=connector.ssl_verify if connector else True)
-        connector.message_process(resource, "Check for duplicate files...")
+            if CLOWDER_API_VERSION == 'v2':
+                if file["name"] == output_json_file or file["name"] == output_xml_file:
+                    url = '%s%s/files/%s?key=%s' % (host, CLOWDER_API_PATH, file["id"], secret_key)
+                    connector.delete(url, verify=connector.ssl_verify if connector else True)
+            else:
+                if file["filename"] == output_json_file or file["filename"] == output_xml_file:
+                    url = '%s%s/files/%s?key=%s' % (host, CLOWDER_API_PATH, file["id"], secret_key)
+                    connector.delete(url, verify=connector.ssl_verify if connector else True)
 
         # upload to clowder
         connector.message_process(resource, "Uploading output files to Clowder...")
