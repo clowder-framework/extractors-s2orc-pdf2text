@@ -26,6 +26,20 @@ BASE_TEMP_DIR = 'temp'
 BASE_OUTPUT_DIR = 'output'
 BASE_LOG_DIR = 'log'
 
+def clowder_context_url():
+    """JSON-LD context URL for metadata. Override via CLOWDER_CONTEXT_URL env."""
+    return os.environ.get(
+        'CLOWDER_CONTEXT_URL',
+        'http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld'
+    )
+
+def clowder_users_url():
+    """Clowder users API URL for metadata agent. Override via CLOWDER_USERS_URL env."""
+    return os.environ.get(
+        'CLOWDER_USERS_URL',
+        'http://clowder.ncsa.illinois.edu/api/users'
+    )
+
 
 class Pdf2TextExtractor(Extractor):
     def __init__(self):
@@ -111,9 +125,9 @@ class Pdf2TextExtractor(Extractor):
         ]
         page_dimensions = {"width": page_width, "height": page_height}
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
-        context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
+        context = clowder_context_url()
+        user_id = clowder_users_url()  # TODO: can update user id in config
         #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
-        user_id = "http://clowder.ncsa.illinois.edu/api/users"  # TODO: can update user id in config
         agent = {"@type": "user", "user_id": user_id}
         metadata = {"@context": [context], "agent": agent, "content": content}
         pyclowder.datasets.upload_metadata(connector, host, secret_key, dataset_id, metadata)
