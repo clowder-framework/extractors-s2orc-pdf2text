@@ -117,12 +117,12 @@ class Pdf2TextExtractor(Extractor):
         xml_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_xml_file)
         csv_fileid = pyclowder.files.upload_to_dataset(connector, host, secret_key, dataset_id, output_csv_file)
         # upload metadata to dataset
-        extracted_files = [
-            {"file_id": input_file_id, "filename": input_filename, "description": "Input pdf file"},
-            {"file_id": xml_fileid, "filename": output_xml_file, "description": "TEI XML output file from Grobid"},
-            {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
-            {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
-        ]
+        extracted_files = {
+            "input_pdf": {"file_id": input_file_id, "filename": input_filename, "description": "Input pdf file"},
+            "grobid_tei_xml": {"file_id": xml_fileid, "filename": output_xml_file, "description": "TEI XML output file from Grobid"},
+            "grobid_json": {"file_id": json_fileid, "filename": output_json_file, "description": "JSON output file form Grobid"},
+            "extracted_csv": {"file_id": csv_fileid, "filename": output_csv_file, "description": "CSV output file with extracted text, section, and coordinates"}
+        }
         page_dimensions = {"width": page_width, "height": page_height}
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
         context = clowder_context_url()
