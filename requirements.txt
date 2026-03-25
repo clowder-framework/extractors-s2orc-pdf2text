@@ -1,5 +1,5 @@
 tqdm
-pyclowder==2.7.0
+pyclowder==3.*
 beautifulsoup4==4.7.1
 boto3==1.9.147
 requests==2.21.0

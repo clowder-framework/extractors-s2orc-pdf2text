@@ -4,10 +4,17 @@
 import time
 import logging
 import os
+import json
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+import requests
 from doc2txt.grobid2json.process_pdf import process_pdf_file
+
+# Use api/v2 when CLOWDER_API_VERSION=v2 (Clowder2)
+# Also supports CLOWDER_VERSION=2 from clowder2 docker-compose
+CLOWDER_API_VERSION = os.environ.get('CLOWDER_API_VERSION') or ('v2' if os.environ.get('CLOWDER_VERSION') == '2' else 'v1')
+CLOWDER_API_PATH = 'api/v2' if CLOWDER_API_VERSION == 'v2' else 'api'
 
 from pyclowder.extractors import Extractor
 import pyclowder.files
@@ -18,6 +25,20 @@ log = logging.getLogger(__name__)
 BASE_TEMP_DIR = 'temp'
 BASE_OUTPUT_DIR = 'output'
 BASE_LOG_DIR = 'log'
+
+def clowder_context_url():
+    """JSON-LD context URL for metadata. Override via CLOWDER_CONTEXT_URL env."""
+    return os.environ.get(
+        'CLOWDER_CONTEXT_URL',
+        'http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld'
+    )
+
+def clowder_users_url():
+    """Clowder users API URL for metadata agent. Override via CLOWDER_USERS_URL env."""
+    return os.environ.get(
+        'CLOWDER_USERS_URL',
+        'http://clowder.ncsa.illinois.edu/api/users'
+    )
 
 
 class Pdf2TextExtractor(Extractor):
@@ -78,12 +99,12 @@ class Pdf2TextExtractor(Extractor):
             page_height = xml_surface_tags[0]['lry']
 
         # clean existing duplicate
+        connector.message_process(resource, "Check for duplicate files...")
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
         for file in files_in_dataset:
-            if file["filename"] == output_json_file or file["filename"] == output_xml_file:
-                url = '%sapi/files/%s?key=%s' % (host, file["id"], secret_key)
-                connector.delete(url, verify=connector.ssl_verify if connector else True)
-        connector.message_process(resource, "Check for duplicate files...")
+            filename_key = "name" if CLOWDER_API_VERSION == 'v2' else "filename"
+            if file.get(filename_key) in [output_json_file, output_xml_file]:
+                pyclowder.files.delete(connector, host, secret_key, file["id"])
 
         # upload to clowder
         connector.message_process(resource, "Uploading output files to Clowder...")
@@ -99,9 +120,9 @@ class Pdf2TextExtractor(Extractor):
         }
         page_dimensions = {"width": page_width, "height": page_height}
         content = {"extractor": "pdf2text-extractor", "extracted_files": extracted_files, "page_dimensions": page_dimensions}
-        context = "http://clowder.ncsa.illinois.edu/contexts/metadata.jsonld"
+        context = clowder_context_url()
+        user_id = clowder_users_url()  # TODO: can update user id in config
         #created_at = datetime.now().strftime("%a %d %B %H:%M:%S UTC %Y")
-        user_id = "http://clowder.ncsa.illinois.edu/api/users"  # TODO: can update user id in config
         agent = {"@type": "user", "user_id": user_id}
         metadata = {"@context": [context], "agent": agent, "content": content}
         pyclowder.datasets.upload_metadata(connector, host, secret_key, dataset_id, metadata)
