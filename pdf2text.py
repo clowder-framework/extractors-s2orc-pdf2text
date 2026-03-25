@@ -102,14 +102,9 @@ class Pdf2TextExtractor(Extractor):
         connector.message_process(resource, "Check for duplicate files...")
         files_in_dataset = pyclowder.datasets.get_file_list(connector, host, secret_key, dataset_id)
         for file in files_in_dataset:
-            if CLOWDER_API_VERSION == 'v2':
-                if file["name"] == output_json_file or file["name"] == output_xml_file:
-                    url = '%s%s/files/%s?key=%s' % (host, CLOWDER_API_PATH, file["id"], secret_key)
-                    connector.delete(url, verify=connector.ssl_verify if connector else True)
-            else:
-                if file["filename"] == output_json_file or file["filename"] == output_xml_file:
-                    url = '%s%s/files/%s?key=%s' % (host, CLOWDER_API_PATH, file["id"], secret_key)
-                    connector.delete(url, verify=connector.ssl_verify if connector else True)
+            filename_key = "name" if CLOWDER_API_VERSION == 'v2' else "filename"
+            if file.get(filename_key) in [output_json_file, output_xml_file]:
+                pyclowder.files.delete(connector, host, secret_key, file["id"])
 
         # upload to clowder
         connector.message_process(resource, "Uploading output files to Clowder...")
