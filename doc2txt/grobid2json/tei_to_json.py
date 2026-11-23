@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup, NavigableString
 from typing import List, Dict, Tuple
 
 from doc2txt.s2orc import Paper
+from doc2txt.sentence_segmentation import split_text_unit
 
 from doc2txt.utils.grobid_util import parse_bib_entry, extract_paper_metadata_from_grobid_xml
 from doc2txt.utils.citation_util import SINGLE_BRACKET_REGEX, BRACKET_REGEX, BRACKET_STYLE_THRESHOLD
@@ -113,6 +114,78 @@ def table_to_html(table: bs4.element.Tag) -> str:
     return table_str
 
 
+# RCTCheck fix (2026-11-02): Keep all paragraph text, including text outside GROBID <s> tags.
+# Existing sentences stay intact; recovered blocks are split before model export.
+def extract_text_units(element: bs4.element.Tag) -> List[Dict]:
+    """Keep GROBID sentences and text outside them, in document order.
+
+    Recovered paragraph/residual text is sentence-segmented. Source paragraph
+    coordinates stay in provenance and are not presented as sentence boxes.
+    """
+    units = []
+
+    def add(text, source, segmented):
+        text = re.sub(r'\s+', ' ', text)
+        if not segmented:
+            text = text.strip()
+        if not text.strip():
+            return
+        # RCTCheck fix: Copy only coordinates supplied for this source element.
+        # A paragraph box is not a sentence box; unavailable coordinates stay None.
+        coords = source.get('coords')
+        unit = {
+            'sentence': text,
+            'coords': coords,
+            'provenance': {
+                'tei_element': source.name,
+                'segmentation': 'grobid_sentence' if segmented else 'unsegmented_text',
+                'coordinate_source': source.name if coords else None,
+                'coordinate_status': 'provided' if coords else 'unavailable'
+            }
+        }
+        # RCTCheck fix: Keep note provenance for both whole-note fallback units
+        # and sentences nested inside a note, including renamed <p> notes.
+        original_note = (source if source.name == 'note' or source.get('data-original-tag') == 'note'
+                         else source.find_parent('note') or source.find_parent(attrs={'data-original-tag': 'note'}))
+        if original_note:
+            unit['provenance']['original_element'] = 'note'
+            unit['provenance']['note_type'] = original_note.get('type')
+            unit['provenance']['note_place'] = original_note.get('place')
+        # RCTCheck fix: Apply fallback segmentation after note metadata is added,
+        # so every derived sentence receives the complete provenance. Existing
+        # GROBID sentence units bypass the splitter unchanged.
+        units.extend(split_text_unit(unit))
+
+    def walk(container):
+        pending = []
+
+        def flush():
+            if pending:
+                add(''.join(pending), container, False)
+                pending.clear()
+
+        # RCTCheck fix: Flush residual text around tagged sentences in source order.
+        # Returning the entire paragraph as well would duplicate existing sentences.
+        for child in container.children:
+            if isinstance(child, NavigableString):
+                # RCTCheck fix: Exclude XML comments and processing instructions.
+                # Keep only document text and CDATA, matching BeautifulSoup.get_text().
+                if type(child) in (NavigableString, bs4.element.CData):
+                    pending.append(str(child))
+            elif child.name == 's':
+                flush()
+                add(child.get_text(), child, True)
+            elif child.name in {'p', 'figDesc', 'div'} or child.find('s'):
+                flush()
+                walk(child)
+            else:
+                pending.append(child.get_text())
+        flush()
+
+    walk(element)
+    return units
+
+
 def extract_figures_and_tables_from_tei_xml(sp: BeautifulSoup) -> Dict[str, Dict]:
     """
     Generate figure and table dicts
@@ -124,25 +197,43 @@ def extract_figures_and_tables_from_tei_xml(sp: BeautifulSoup) -> Dict[str, Dict
     for fig in sp.find_all('figure'):
         try:
             if fig.name and fig.get('xml:id'):
+                # RCTCheck fix: Save caption text units, genuine coordinates and
+                # reference IDs before the figure/table XML is removed below.
+                caption = fig.figDesc or fig.head
+                caption_sentences = extract_text_units(caption) if caption else []
+                for sentence in caption_sentences:
+                    sentence['provenance']['reference_id'] = normalize_grobid_id(fig.get('xml:id'))
+                # RCTCheck fix: Retain figure/table notes separately from captions.
+                # Do not flatten structured table cells into sentence records.
+                note_sentences = []
+                for note in fig.find_all('note', recursive=False):
+                    note_sentences.extend(extract_text_units(note))
+                for sentence in note_sentences:
+                    sentence['provenance']['reference_id'] = normalize_grobid_id(fig.get('xml:id'))
+                    sentence['provenance']['reference_kind'] = 'note'
                 if fig.get('type') == 'table':
                     ref_map[normalize_grobid_id(fig.get('xml:id'))] = {
                         "text": fig.figDesc.text.strip() if fig.figDesc else fig.head.text.strip() if fig.head else "",
                         "latex": None,
                         "type": "table",
                         "content": table_to_html(fig.table),
-                        "fig_num": fig.get('xml:id')
+                        "fig_num": fig.get('xml:id'),
+                        "sentences": caption_sentences,
+                        "notes": note_sentences
                     }
                 else:
-                    if True in [char.isdigit() for char in fig.findNext('head').findNext('label')]:
-                        fig_num = fig.findNext('head').findNext('label').contents[0]
-                    else:
-                        fig_num = None
+                    # RCTCheck fix: Read this figure's own label; a forward search
+                    # could read another figure or fail when a label is absent.
+                    label = fig.find('label', recursive=False)
+                    fig_num = label.get_text(strip=True) if label else None
                     ref_map[normalize_grobid_id(fig.get('xml:id'))] = {
                         "text": fig.figDesc.text.strip() if fig.figDesc else "",
                         "latex": None,
                         "type": "figure",
                         "content": "",
-                        "fig_num": fig_num
+                        "fig_num": fig_num,
+                        "sentences": caption_sentences,
+                        "notes": note_sentences
                     }
         except AttributeError:
             continue
@@ -185,9 +276,10 @@ def sub_all_note_tags(sp: BeautifulSoup) -> BeautifulSoup:
     :return:
     """
     for ntag in sp.find_all('note'):
-        p_tag = sp.new_tag('p')
-        p_tag.string = ntag.text.strip()
-        ntag.replace_with(p_tag)
+        # RCTCheck fix: Rename the note in place. Replacing it with a plain-text
+        # paragraph previously discarded nested <s> tags and coordinate metadata.
+        ntag['data-original-tag'] = 'note'
+        ntag.name = 'p'
     return sp
 
 
@@ -432,19 +524,9 @@ def process_paragraph(
             'eq_spans': [],
             'section': section_names
         }
-    # Find all <s> tags within <p>
-    s_tags = para_el.find_all('s')
-    # Iterate through <s> tags and extract "coords" attribute and text
-    for s_tag in s_tags:
-        text = s_tag.text
-        # substitute space characters
-        text = re.sub(r'\s+', ' ', text)
-        text = re.sub(r'\s', ' ', text)
-        coords = s_tag.get('coords')
-        sentence_texts.append({
-            'sentence': text,
-            'coords': coords
-        })
+    # RCTCheck fix: The former find_all("s")-only loop silently dropped nonempty
+    # paragraphs without sentence tags, including trial registration and funding.
+    sentence_texts = extract_text_units(para_el)
 
     # replace formulas with formula text
     process_formulas_in_paragraph(para_el, sp)

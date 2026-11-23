@@ -17,9 +17,11 @@ SKIP_KEYS = {
     'bib_id'
 }
 
+# RCTCheck fix (2026-11-02): Allow caption/notes records through the figure/table JSON serializer.
+# Otherwise their text-unit coordinates and provenance would be dropped again.
 REFERENCE_OUTPUT_KEYS = {
-    'figure': {'text', 'type_str', 'uris', 'num', 'fig_num'},
-    'table': {'text', 'type_str', 'content', 'num', 'html'},
+    'figure': {'text', 'type_str', 'uris', 'num', 'fig_num', 'sentences', 'notes'},
+    'table': {'text', 'type_str', 'content', 'num', 'html', 'sentences', 'notes'},
     'footnote': {'text', 'type_str', 'num'},
     'section': {'text', 'type_str', 'num', 'parent'},
     'equation': {'text', 'type_str', 'latex', 'mathml', 'num'}
@@ -63,7 +65,10 @@ class ReferenceEntry:
             uris: Optional[List[str]] = None,
             num: Optional[str] = None,
             parent: Optional[str] = None,
-            fig_num: Optional[str] = None
+            fig_num: Optional[str] = None,
+            # RCTCheck fix: Carry extracted caption and note units through this class.
+            sentences: Optional[List[Dict]] = None,
+            notes: Optional[List[Dict]] = None
     ):
         self.ref_id = ref_id
         self.text = text
@@ -76,6 +81,9 @@ class ReferenceEntry:
         self.num = num
         self.parent = parent
         self.fig_num = fig_num
+        # RCTCheck fix: Preserve the unit dictionaries, including their provenance.
+        self.sentences = sentences
+        self.notes = notes
 
     def as_json(self):
         keep_keys = REFERENCE_OUTPUT_KEYS.get(self.type_str, None)
@@ -446,7 +454,9 @@ class Paper:
         sentences = ''
         for para in self.abstract:
             sentences = ' '.join([sent['sentence'] for sent in para.text])
-        abstract_text += sentences + '\n'
+            # RCTCheck fix: Append inside the loop so every abstract paragraph
+            # reaches the top-level string. Structured CSV export is separate.
+            abstract_text += sentences + '\n'
         return abstract_text
 
     @property
@@ -459,7 +469,9 @@ class Paper:
         sentences = ''
         for para in self.body_text:
             sentences = ' '.join([sent['sentence'] for sent in para.text])
-        body_text += sentences + '\n'
+            # RCTCheck fix: The same indentation defect kept only the last body
+            # paragraph. Accumulate every paragraph in this convenience string.
+            body_text += sentences + '\n'
         return body_text
 
     def release_json(self, doc_type: str="pdf"):

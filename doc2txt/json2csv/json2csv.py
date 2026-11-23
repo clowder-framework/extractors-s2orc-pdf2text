@@ -4,6 +4,7 @@ import json
 import logging
 
 import pandas as pd
+from doc2txt.sentence_segmentation import split_text_unit
 
 # create log object with current module name
 log = logging.getLogger(__name__)
@@ -20,7 +21,8 @@ def process_json2csv(input_filename, json_input_file):
         df: pandas dataframe
     """
     log.info("Extracting information from json file: %s", json_input_file)
-    json_file = open(json_input_file)
+    # RCTCheck fix: Read the UTF-8 JSON consistently across operating systems.
+    json_file = open(json_input_file, encoding='utf-8')
     json_data = json.load(json_file)  # load json object to a dictionary
 
     title_text = json_data["title"]["text"]
@@ -38,7 +40,34 @@ def process_json2csv(input_filename, json_input_file):
     body_df = extract_sentences(input_filename, body_data)
     back_matter_df = extract_sentences(input_filename, back_matter_data)
 
-    frames = [title_df, abstract_df, body_df, back_matter_df]
+    # RCTCheck fix: Captions/notes live in ref_entries, outside the original
+    # abstract/body/back-matter export. Include them with explicit section labels.
+    caption_data = []
+    note_data = []
+    for reference_id, entry in pdf_json_data.get('ref_entries', {}).items():
+        reference_type = entry.get('type_str', entry.get('type'))
+        if reference_type not in {'figure', 'table'}:
+            continue
+        sentences = entry.get('sentences')
+        # RCTCheck fix: Support older JSON with caption text but no sentence list.
+        # Mark legacy caption text for the same sentence splitting used for TEI.
+        if not sentences and entry.get('text'):
+            sentences = [{'sentence': entry['text'], 'coords': None,
+                          'provenance': {'segmentation': 'unsegmented_text',
+                                         'tei_element': 'legacy_caption'}}]
+        caption_data.append({
+            'section': reference_type.capitalize() + ' caption',
+            'text': sentences or []
+        })
+        note_data.append({
+            'section': reference_type.capitalize() + ' note',
+            'text': entry.get('notes') or []
+        })
+    caption_df = extract_sentences(input_filename, caption_data)
+    note_df = extract_sentences(input_filename, note_data)
+    # RCTCheck fix: Keep existing records in order and append captions/notes.
+    # Retain the four-column CSV contract; extra provenance remains in JSON.
+    frames = [title_df, abstract_df, body_df, back_matter_df, caption_df, note_df]
     df = pd.concat(frames)
 
     json_file.close()
@@ -63,20 +92,22 @@ def extract_sentences(input_file, data):
         for i, s in enumerate(para['text']):
             # Handle both dictionary and string formats
             if isinstance(s, dict):
-                # Expected format: dictionary with 'sentence' and 'coords' keys
-                sentence = s.get('sentence', '')
-                coords = s.get('coords', '')
+                # RCTCheck fix: Also support JSON produced by the earlier
+                # retention-only patch. Tagged GROBID/derived units are unchanged.
+                units = split_text_unit(s)
             elif isinstance(s, str):
-                # Handle case where text is directly a string
-                sentence = s
-                coords = ''
+                units = split_text_unit({'sentence': s, 'coords': None,
+                                         'provenance': {'segmentation': 'unsegmented_text',
+                                                        'tei_element': 'legacy_text'}})
             else:
                 # Skip unexpected formats
                 continue
                 
-            new_row = {'file': input_file, 'section': para['section'],
-                       'sentence': sentence, 'coordinates': coords}
-            list_df.append(new_row)
+            for unit in units:
+                new_row = {'file': input_file, 'section': para['section'],
+                           'sentence': unit.get('sentence', ''),
+                           'coordinates': unit.get('coords', '')}
+                list_df.append(new_row)
     df = pd.DataFrame(list_df)
 
     return df if len(list_df) > 0 else pd.DataFrame(columns=['file', 'section', 'sentence', 'coordinates'])
